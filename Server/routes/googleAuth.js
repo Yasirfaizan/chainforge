@@ -81,7 +81,7 @@ router.get(
       return res.status(503).json({ error: "Google auth not configured" });
     return passport.authenticate("google", {
       session: false,
-      failureRedirect: `${process.env.CLIENT_ORIGIN}/client/login`,
+      failureRedirect: `${process.env.CLIENT_ORIGIN || "http://localhost:5173"}/login`,
     })(req, res, next);
   },
   async (req, res, next) => {
