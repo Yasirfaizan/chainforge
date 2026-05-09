@@ -6,7 +6,6 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
 import api from "../../lib/api.js";
 import WalletModalV2 from "../../components/WalletModalV2.jsx";
-import TurnstileWidget from "../../components/TurnstileWidget.jsx";
 
 // Verification code input component
 function VerificationInput({ onSubmit, onResend, email, loading, timeLeft }) {
@@ -316,7 +315,6 @@ export default function ClientLogin() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [timeLeft, setTimeLeft] = useState(900); // 15 minutes
   const [walletOpen, setWalletOpen] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState("");
 
   const navigate = useNavigate();
   const { loginClient } = useAuth();
@@ -346,15 +344,11 @@ export default function ClientLogin() {
   const handleEmailLoginInitiate = async (e) => {
     e.preventDefault();
     if (!validateEmailLogin()) return;
-    if (!turnstileToken && import.meta.env.VITE_TURNSTILE_SITE_KEY) {
-      return showToast("Please complete Turnstile challenge", "error");
-    }
     setLoading(true);
     try {
       const response = await api.post("/api/client/login/initiate", {
         email: email.trim().toLowerCase(),
         password,
-        turnstileToken,
       });
 
       showToast(response.data.message, "success");
@@ -550,11 +544,6 @@ export default function ClientLogin() {
                     >
                       Forgot password?
                     </button>
-                  </div>
-
-                  {/* Cloudflare Turnstile */}
-                  <div className="flex justify-center">
-                    <TurnstileWidget onToken={setTurnstileToken} />
                   </div>
 
                   <button
