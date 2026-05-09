@@ -17,13 +17,18 @@ const googleEnabled = Boolean(
 );
 
 if (googleEnabled) {
+  // Always use explicit full HTTPS URL — behind Railway's proxy, passport can
+  // reconstruct an http:// callback URL which Google then rejects.
+  const googleCallbackURL =
+    process.env.GOOGLE_CALLBACK_URL ||
+    "https://chainforge-production.up.railway.app/api/auth/google/callback";
+
   passport.use(
     new GoogleStrategy(
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL:
-          process.env.GOOGLE_CALLBACK_URL || "/api/auth/google/callback",
+        callbackURL: googleCallbackURL,
       },
       (_accessToken, _refreshToken, profile, done) => done(null, profile),
     ),

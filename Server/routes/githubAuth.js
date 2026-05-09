@@ -16,14 +16,23 @@ const githubEnabled = Boolean(
 );
 
 if (githubEnabled) {
+  // IMPORTANT: Always use the explicit full HTTPS URL from env.
+  // Behind Railway's reverse proxy, passport-github2 can construct an http://
+  // callback URL from req.protocol which causes GitHub to reject it with
+  // "redirect_uri is not associated with this application".
+  const githubCallbackURL =
+    process.env.GITHUB_CALLBACK_URL ||
+    "https://chainforge-production.up.railway.app/api/auth/github/callback";
+
   passport.use(
     new GitHubStrategy(
       {
         clientID: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        callbackURL:
-          process.env.GITHUB_CALLBACK_URL || "/api/auth/github/callback",
+        callbackURL: githubCallbackURL,
         scope: ["user:email"],
+        // Do NOT pass `proxy: true` — that makes passport reconstruct the URL
+        // from request headers which can differ from what GitHub has registered.
       },
       (_accessToken, _refreshToken, profile, done) => done(null, profile),
     ),

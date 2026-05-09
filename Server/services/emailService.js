@@ -1,31 +1,46 @@
 import nodemailer from "nodemailer";
 
-// Create transporter based on environment
+/**
+ * Create a nodemailer transporter for Gmail SMTP.
+ *
+ * Key points:
+ *  - Port 587 requires STARTTLS (secure: false + requireTLS: true)
+ *  - SMTP_PORT env var comes in as a string → parseInt() is required
+ *  - Gmail App Passwords (16-char, no spaces) must be used when 2FA is on
+ *  - We call transporter.verify() at startup so a bad config fails loudly
+ */
 const createTransporter = () => {
-  // For development/testing - use Ethereal (fake SMTP)
-  if (process.env.NODE_ENV === "development" && !process.env.SMTP_HOST) {
-    return nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.ETHEREAL_USER,
-        pass: process.env.ETHEREAL_PASS,
-      },
-    });
-  }
+  const host = process.env.SMTP_HOST || "smtp.gmail.com";
+  const port = parseInt(process.env.SMTP_PORT || "587", 10);
+  // port 465 uses implicit TLS; all other ports (587, 25) use STARTTLS
+  const secure = port === 465;
 
-  // Production SMTP
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "smtp.gmail.com",
-    port: process.env.SMTP_PORT || 587,
-    secure: false,
+    host,
+    port,
+    secure,
+    requireTLS: !secure,   // force STARTTLS upgrade on port 587
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
+    tls: {
+      // Accept Gmail's cert in all environments
+      rejectUnauthorized: true,
+      minVersion: "TLSv1.2",
+    },
   });
 };
+
+// Verify SMTP config once at module load so misconfiguration is caught early
+const _transporter = createTransporter();
+_transporter.verify().then(() => {
+  console.log("✅ SMTP connection verified — emails will send correctly");
+}).catch((err) => {
+  console.error("❌ SMTP verification failed:", err.message);
+  console.error("   Check SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASS in env");
+});
+
 
 const normalizeVerificationType = (type) => {
   if (type === "admin_signup") return { baseType: "signup", isAdmin: true };
@@ -210,10 +225,9 @@ If you didn't make this change, please contact support immediately.
 // Send verification email
 export const sendVerificationEmail = async (email, code, type) => {
   try {
-    const transporter = createTransporter();
     const template = templates.verification(code, type);
 
-    const info = await transporter.sendMail({
+    const info = await _transporter.sendMail({
       from: `"ChainForge" <${process.env.SMTP_USER || "noreply@chainforge.io"}>`,
       to: email,
       subject: template.subject,
@@ -232,10 +246,9 @@ export const sendVerificationEmail = async (email, code, type) => {
 // Send welcome email
 export const sendWelcomeEmail = async (email, name) => {
   try {
-    const transporter = createTransporter();
     const template = templates.welcome(name);
 
-    const info = await transporter.sendMail({
+    const info = await _transporter.sendMail({
       from: `"ChainForge" <${process.env.SMTP_USER || "noreply@chainforge.io"}>`,
       to: email,
       subject: template.subject,
@@ -254,10 +267,9 @@ export const sendWelcomeEmail = async (email, name) => {
 // Send password reset confirmation
 export const sendPasswordResetConfirmation = async (email, name) => {
   try {
-    const transporter = createTransporter();
     const template = templates.passwordReset(name);
 
-    await transporter.sendMail({
+    await _transporter.sendMail({
       from: `"ChainForge" <${process.env.SMTP_USER || "noreply@chainforge.io"}>`,
       to: email,
       subject: template.subject,

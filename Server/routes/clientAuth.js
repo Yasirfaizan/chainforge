@@ -10,7 +10,9 @@ const router = express.Router();
 // Mount split route modules
 router.use("/signup", signupRoutes);
 router.use("/login", loginRoutes);
-router.use("/password", passwordRoutes);
+// Password routes define /forgot-password, /forgot-password/verify, /reset-password
+// Mount at root (not /password) so client calls like /api/client/forgot-password resolve correctly
+router.use("/", passwordRoutes);
 router.use(walletAuthRoutes);
 
 // Protected routes for authenticated users
