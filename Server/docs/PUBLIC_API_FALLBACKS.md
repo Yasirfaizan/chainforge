@@ -10,8 +10,8 @@ ChainForge supports on-chain data queries for 15 blockchains. Most chains have f
 
 | Chain         | Default Endpoint                      | Type     | Rate Limit | Notes                            |
 | ------------- | ------------------------------------- | -------- | ---------- | -------------------------------- |
-| **Ethereum**  | `https://eth.public.jsonrpc.io`       | JSON-RPC | Low        | Cloudflare managed public RPC    |
-| **Polygon**   | `https://polygon.public.jsonrpc.io`   | JSON-RPC | Low        | Cloudflare managed public RPC    |
+| **Ethereum**  | `https://eth.public.jsonrpc.io`       | JSON-RPC | Low        | Public JSON-RPC endpoint    |
+| **Polygon**   | `https://polygon.public.jsonrpc.io`   | JSON-RPC | Low        | Public JSON-RPC endpoint    |
 | **BNB Chain** | `https://bsc.publicnode.com`          | JSON-RPC | Medium     | PublicNode provider              |
 | **Avalanche** | `https://avalanche.public.jsonrpc.io` | JSON-RPC | Low        | Ava Labs public endpoint         |
 | **Arbitrum**  | `https://arb.publicnode.com`          | JSON-RPC | Medium     | PublicNode provider              |

@@ -4,7 +4,6 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
 import { adminConsolePath } from "../../lib/adminPaths.js";
 import { adminLoginInitiate, adminLoginVerify } from "../../lib/api.js";
-import TurnstileWidget from "../../components/TurnstileWidget.jsx";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -12,7 +11,6 @@ export default function AdminLogin() {
   const { showToast } = useToast();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -31,15 +29,11 @@ export default function AdminLogin() {
     if (!formData.email || !formData.password) {
       return showToast("Fill email and password", "error");
     }
-    if (!turnstileToken && import.meta.env.VITE_TURNSTILE_SITE_KEY) {
-      return showToast("Please complete Turnstile challenge", "error");
-    }
     setLoading(true);
     try {
       await adminLoginInitiate({
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
-        turnstileToken,
       });
       setStep(2);
     } catch (err) {
@@ -92,7 +86,6 @@ export default function AdminLogin() {
       await adminLoginInitiate({
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
-        turnstileToken,
       });
       showToast("New code sent", "success");
     } catch (err) {
@@ -124,7 +117,6 @@ export default function AdminLogin() {
               value={formData.password}
               onChange={(e) => setField("password", e.target.value)}
             />
-            <TurnstileWidget onToken={setTurnstileToken} />
             <button
               disabled={loading}
               className="w-full rounded-lg bg-red-600 py-2 text-sm font-semibold text-white"

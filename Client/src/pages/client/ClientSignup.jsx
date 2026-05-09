@@ -8,7 +8,6 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
 import api from "../../lib/api.js";
 import WalletModalV2 from "../../components/WalletModalV2.jsx";
-import TurnstileWidget from "../../components/TurnstileWidget.jsx";
 
 // Verification code input component
 function VerificationInput({ onSubmit, onResend, email, loading, timeLeft }) {
@@ -130,7 +129,6 @@ export default function ClientSignup() {
   const [showVerification, setShowVerification] = useState(false);
   const [timeLeft, setTimeLeft] = useState(900); // 15 minutes
   const [walletOpen, setWalletOpen] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState("");
   const strength = zxcvbn(formData.password || "").score;
 
   const navigate = useNavigate();
@@ -170,9 +168,6 @@ export default function ClientSignup() {
   const handleInitiateSignup = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    if (!turnstileToken && import.meta.env.VITE_TURNSTILE_SITE_KEY) {
-      return showToast("Please complete Turnstile challenge", "error");
-    }
 
     setLoading(true);
     try {
@@ -180,7 +175,6 @@ export default function ClientSignup() {
         name: formData.name.trim(),
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
-        turnstileToken,
       };
       await api.post("/api/client/signup/initiate", payload);
 
@@ -386,11 +380,6 @@ export default function ClientSignup() {
                       </p>
                     )}
                   </div>
-                </div>
-
-                {/* Cloudflare Turnstile */}
-                <div className="flex justify-center">
-                  <TurnstileWidget onToken={setTurnstileToken} />
                 </div>
 
                 <button

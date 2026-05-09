@@ -4,7 +4,6 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
 import { adminConsolePath } from "../../lib/adminPaths.js";
 import { adminSignupInitiate, adminSignupVerify } from "../../lib/api.js";
-import TurnstileWidget from "../../components/TurnstileWidget.jsx";
 
 export default function AdminSignup() {
   const navigate = useNavigate();
@@ -12,7 +11,6 @@ export default function AdminSignup() {
   const { showToast } = useToast();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [form, setForm] = useState({
     name: "",
@@ -37,7 +35,6 @@ export default function AdminSignup() {
         email: form.email.trim().toLowerCase(),
         password: form.password,
         adminCode: form.adminCode.trim(),
-        turnstileToken,
       });
       setStep(2);
       showToast("Verification code sent to your email", "success");
@@ -107,7 +104,6 @@ export default function AdminSignup() {
               value={form.adminCode}
               onChange={(e) => setField("adminCode", e.target.value)}
             />
-            <TurnstileWidget onToken={setTurnstileToken} />
             <button
               disabled={loading}
               className="w-full rounded-lg bg-red-600 py-2 text-sm font-semibold text-white"

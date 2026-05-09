@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
-import { fetchMe, setAuthHeader } from "../../lib/api.js";
+import { api, fetchMe, setAuthHeader } from "../../lib/api.js";
 
 export default function AuthCallback() {
   const [searchParams] = useSearchParams();
@@ -17,8 +17,15 @@ export default function AuthCallback() {
         try {
           // Set header temporarily to fetch user info
           setAuthHeader(token);
-          const userData = await fetchMe();
-          
+          let userData;
+          try {
+            userData = await fetchMe();
+          } catch {
+            // fetchMe hits /api/data/me — fallback to the correct client profile endpoint
+            const fallback = await api.get("/api/client/me").then((r) => r.data);
+            userData = fallback?.user || fallback;
+          }
+
           await loginClient(token, userData); 
           showToast(`Welcome back, ${userData.name || "Developer"}!`, "success");
           navigate("/dashboard");
