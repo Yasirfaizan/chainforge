@@ -33,6 +33,21 @@ import ApiUsageLog from "./models/ApiUsageLog.js";
 
 const PUBLIC_DNS_SERVERS = ["8.8.8.8", "1.1.1.1"];
 
+function normalizeOrigin(origin = "") {
+  return String(origin).trim().replace(/\/$/, "");
+}
+
+function buildAllowedOrigins() {
+  const raw = process.env.CLIENT_ORIGIN;
+  if (!raw) return null;
+  return raw
+    .split(",")
+    .map((value) => normalizeOrigin(value))
+    .filter(Boolean);
+}
+
+const allowedOrigins = buildAllowedOrigins();
+
 function toMongoStandardUriFromSrv(uri, hosts, txtParams) {
   const url = new URL(uri);
   const username = url.username
@@ -96,7 +111,16 @@ app.set("trust proxy", 1);
 /* ——— Global middleware ——— */
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || true,
+    origin(origin, callback) {
+      if (!allowedOrigins || allowedOrigins.length === 0 || !origin) {
+        return callback(null, true);
+      }
+      const normalized = normalizeOrigin(origin);
+      if (allowedOrigins.includes(normalized)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   }),
 );
