@@ -368,7 +368,7 @@ export default function Docs() {
           <p className="mt-2 text-sm text-cf-muted">
             Base URL:{" "}
             <code className="rounded bg-cf-code px-1.5 py-0.5 font-mono text-purple-600 dark:text-purple-400">
-              {import.meta.env.VITE_API_URL || "https://chainforge-gold.vercel.app/"}
+              {import.meta.env.}VITE_API_URL || "https://chainforge-gold.vercel.app/"}
             </code>
           </p>
           <CodeBlock lang="bash">{`# 1. Sign up
