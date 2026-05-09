@@ -36,23 +36,7 @@ router.post(
   validate({ email: "string", password: "string" }),
   async (req, res, next) => {
     try {
-      const { name, email, password, turnstileToken } = req.body;
-
-      // Validate Turnstile token if provided
-      if (turnstileToken && process.env.TURNSTILE_SECRET_KEY) {
-        const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: `secret=${encodeURIComponent(process.env.TURNSTILE_SECRET_KEY)}&response=${encodeURIComponent(turnstileToken)}&remoteip=${encodeURIComponent(req.ip)}`,
-        });
-        
-        const turnstileResult = await turnstileResponse.json();
-        if (!turnstileResult.success) {
-          return res.status(400).json({ error: "Invalid Turnstile token" });
-        }
-      }
+      const { name, email, password } = req.body;
 
       if (password.length < 8) {
         return res
