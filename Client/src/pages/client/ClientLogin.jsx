@@ -539,7 +539,10 @@ export default function ClientLogin() {
                   <div className="flex justify-end">
                     <button
                       type="button"
-                      onClick={() => setShowForgotPassword(true)}
+                      onClick={() => {
+                        setShowVerification(false);
+                        setShowForgotPassword(true);
+                      }}
                       className="text-sm text-primary hover:underline"
                     >
                       Forgot password?
@@ -609,6 +612,17 @@ export default function ClientLogin() {
                     >
                       Sign up
                     </Link>
+                    {" · "}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowVerification(false);
+                        setShowForgotPassword(true);
+                      }}
+                      className="text-primary font-bold hover:underline ml-1"
+                    >
+                      Forgot password
+                    </button>
                   </p>
                 </div>
               </motion.div>

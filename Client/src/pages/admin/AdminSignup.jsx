@@ -104,7 +104,6 @@ export default function AdminSignup() {
               value={form.adminCode}
               onChange={(e) => setField("adminCode", e.target.value)}
             />
-            <TurnstileWidget onToken={setTurnstileToken} />
             <button
               disabled={loading}
               className="w-full rounded-lg bg-red-600 py-2 text-sm font-semibold text-white"
