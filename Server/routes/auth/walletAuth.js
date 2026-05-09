@@ -10,6 +10,16 @@ import bs58 from "bs58";
 
 const router = express.Router();
 
+function walletPlaceholderEmail(address, chain) {
+  const safeAddress = String(address || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  const safeChain = String(chain || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  return `wallet-${safeChain}-${safeAddress}@wallet.chainforge.local`;
+}
+
 function clientPayload(user) {
   return {
     id: user._id.toString(),
@@ -138,6 +148,7 @@ router.post(
       if (!user) {
         // Create new user with wallet as primary auth method
         user = await User.create({
+          email: walletPlaceholderEmail(normalizedAddress, normalizedChain),
           role: "client",
           authMethod: "wallet",
           walletAddress: normalizedAddress,
@@ -147,7 +158,7 @@ router.post(
           wallets: [{
             address: normalizedAddress,
             chain: normalizedChain,
-            type: normalizedChain === "solana" ? "solana" : "evm",
+            type: "injected",
             isPrimary: true,
             label: `${normalizedChain} Wallet`,
             addedAt: new Date(),
@@ -166,7 +177,7 @@ router.post(
         await user.addWallet({
           address: normalizedAddress,
           chain: normalizedChain,
-          type: normalizedChain === "solana" ? "solana" : "evm",
+          type: "injected",
           label: `${normalizedChain} Wallet`,
         });
       }

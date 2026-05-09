@@ -33,6 +33,16 @@ function normalizeEvmAddress(addr) {
     .toLowerCase();
 }
 
+function walletPlaceholderEmail(address, chain) {
+  const safeAddress = String(address || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  const safeChain = String(chain || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  return `wallet-${safeChain}-${safeAddress}@wallet.chainforge.local`;
+}
+
 function buildWalletAuthMessage({ address, chain, nonce, origin }) {
   const issuedAt = new Date().toISOString();
   const safeOrigin = origin || process.env.CLIENT_ORIGIN || "http://localhost";
@@ -196,7 +206,7 @@ router.post("/verify", walletAuthLimiter, async (req, res, next) => {
     let isNewUser = false;
     let mergedWallet = false;
     if (!user && authenticatedUser) {
-      const walletType = normalizedChain === "solana" ? "solana" : "evm";
+      const walletType = "injected";
       const alreadyLinked =
         authenticatedUser.wallets.some(
           (w) =>
@@ -231,6 +241,7 @@ router.post("/verify", walletAuthLimiter, async (req, res, next) => {
 
     if (!user) {
       user = await User.create({
+        email: walletPlaceholderEmail(recoveredAddress, normalizedChain),
         walletAddress: recoveredAddress,
         chain: normalizedChain,
         role: "client",
