@@ -226,7 +226,12 @@ class ChainForgeWalletSDK {
       });
       return out.signature || out;
     }
-    return this.signer.signMessage(message);
+    const signer = this.signer || (this.provider?.getSigner ? await this.provider.getSigner() : null);
+    if (!signer?.signMessage) {
+      throw new Error("Selected wallet does not expose an EVM signer. Reconnect wallet and try again.");
+    }
+    this.signer = signer;
+    return signer.signMessage(message);
   }
 
   async signTx(tx) {

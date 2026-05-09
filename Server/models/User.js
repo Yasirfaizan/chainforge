@@ -1,5 +1,12 @@
 import mongoose from "mongoose";
 
+function normalizeWalletType(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  if (raw === "private_key") return "private_key";
+  return "injected";
+}
+
+
 /**
  * Identity Bridge Design Pattern
  * ================================
@@ -47,6 +54,7 @@ const walletSchema = new mongoose.Schema({
     type: String,
     enum: ["injected", "private_key"],
     default: "injected",
+    set: normalizeWalletType,
   },
   label: {
     type: String,
@@ -155,6 +163,13 @@ const userSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+userSchema.pre("validate", function autoFillWalletEmail(next) {
+  if (!this.email && this.authMethod === "wallet") {
+    this.email = buildWalletPlaceholderEmail(this.walletAddress, this.chain);
+  }
+  next();
+});
+
 // Compound indexes for wallet lookups
 userSchema.index({ walletAddress: 1, chain: 1 }, { sparse: true });
 userSchema.index({ "wallets.address": 1, "wallets.chain": 1 });
@@ -167,6 +182,7 @@ userSchema.virtual("primaryWallet").get(function () {
 // Method to add a wallet
 userSchema.methods.addWallet = async function (walletData) {
   const { address, chain, type, label } = walletData;
+  const normalizedType = normalizeWalletType(type);
 
   // Check if wallet already exists
   const exists = this.wallets.find(
@@ -184,7 +200,7 @@ userSchema.methods.addWallet = async function (walletData) {
   this.wallets.push({
     address,
     chain,
-    type,
+    type: normalizedType,
     label: label || `Wallet ${walletNumber}`,
     isPrimary: this.wallets.length === 0, // First wallet is primary
     addedAt: new Date(),

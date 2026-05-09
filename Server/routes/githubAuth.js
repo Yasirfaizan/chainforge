@@ -17,14 +17,25 @@ const githubEnabled = Boolean(
   process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET,
 );
 
+function resolveGitHubCallbackUrl(req) {
+  if (process.env.GITHUB_CALLBACK_URL) {
+    return process.env.GITHUB_CALLBACK_URL;
+  }
+
+  const forwardedProto = req.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const forwardedHost = req.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const proto = forwardedProto || req.protocol || "http";
+  const host = forwardedHost || req.get("host") || "localhost:5001";
+  return `${proto}://${host}/api/auth/github/callback`;
+}
+
 if (githubEnabled) {
   passport.use(
     new GitHubStrategy(
       {
         clientID: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        callbackURL:
-          process.env.GITHUB_CALLBACK_URL || "/api/auth/github/callback",
+        callbackURL: process.env.GITHUB_CALLBACK_URL || "http://localhost:5001/api/auth/github/callback",
         scope: ["user:email"],
       },
       (_accessToken, _refreshToken, profile, done) => done(null, profile),
@@ -63,7 +74,8 @@ async function upsertGitHubUser({ email, name, githubId, avatarUrl }) {
 router.get("/github", (req, res, next) => {
   if (!githubEnabled)
     return res.status(503).json({ error: "GitHub auth not configured" });
-  return passport.authenticate("github", { scope: ["user:email"] })(
+  const callbackURL = resolveGitHubCallbackUrl(req);
+  return passport.authenticate("github", { scope: ["user:email"], callbackURL })(
     req,
     res,
     next,
@@ -75,9 +87,11 @@ router.get(
   (req, res, next) => {
     if (!githubEnabled)
       return res.status(503).json({ error: "GitHub auth not configured" });
+    const callbackURL = resolveGitHubCallbackUrl(req);
     return passport.authenticate("github", {
       session: false,
       failureRedirect: `${clientOrigin}/login`,
+      callbackURL,
     })(req, res, next);
   },
   async (req, res, next) => {

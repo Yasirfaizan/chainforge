@@ -94,14 +94,15 @@ router.post(
         return res.status(404).json({ error: "User not found" });
       }
 
-      await user.addWallet({ address, chain, type, label });
+      const walletStorageType = type === "private_key" ? "private_key" : "injected";
+      await user.addWallet({ address, chain, type: walletStorageType, label });
 
       webhookService
         .triggerEvent(
           userId,
           "wallet.linked",
           webhookService.EventBuilders.walletLinked(
-            { address, chain, type, label: label || "" },
+            { address, chain, type: walletStorageType, label: label || "" },
             user,
           ),
           { chain, walletAddress: address },

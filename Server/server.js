@@ -559,9 +559,9 @@ app.use("/api/client", clientAuthRoutes);
 app.use("/api/auth", googleAuthRoutes);
 app.use("/api/auth", githubAuthRoutes);
 app.use("/api/auth/wallet", walletAuthRoutes);
-app.use("/api/admin", adminGuard, adminAuthRoutes);
+app.use("/api/admin", adminAuthRoutes);
 if (ADMIN_ROUTE_SLUG) {
-app.use(`/api/admin/${ADMIN_ROUTE_SLUG}`, adminGuard, adminAuthRoutes);
+app.use(`/api/admin/${ADMIN_ROUTE_SLUG}`, adminAuthRoutes);
 }
 app.use("/api/admin/mgmt", adminGuard, adminMgmtRoutes);
 app.use("/api/keys", apiKeyRoutes);
