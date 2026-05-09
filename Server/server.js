@@ -34,19 +34,12 @@ import ApiUsageLog from "./models/ApiUsageLog.js";
 const PUBLIC_DNS_SERVERS = ["8.8.8.8", "1.1.1.1"];
 
 function normalizeOrigin(origin = "") {
-  const raw = String(origin).trim();
-  if (!raw) return "";
-  try {
-    return new URL(raw).origin;
-  } catch {
-    return raw.replace(/\/$/, "");
-  }
+  return String(origin).trim().replace(/\/$/, "");
 }
 
 function buildAllowedOrigins() {
   const raw = process.env.CLIENT_ORIGIN;
   if (!raw) return null;
-  if (raw.trim() === "*") return ["*"];
   return raw
     .split(",")
     .map((value) => normalizeOrigin(value))
@@ -119,12 +112,7 @@ app.set("trust proxy", 1);
 app.use(
   cors({
     origin(origin, callback) {
-      if (
-        !allowedOrigins ||
-        allowedOrigins.length === 0 ||
-        allowedOrigins.includes("*") ||
-        !origin
-      ) {
+      if (!allowedOrigins || allowedOrigins.length === 0 || !origin) {
         return callback(null, true);
       }
       const normalized = normalizeOrigin(origin);
