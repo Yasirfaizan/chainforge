@@ -51,7 +51,7 @@ router.post(
         .trim()
         .toLowerCase();
       const normalizedAddress = String(walletAddress || address || "").trim();
-
+      const normalizedAddressLower = normalizedAddress.toLowerCase();
       if (!normalizedAddress || !normalizedChain) {
         return res
           .status(400)
@@ -88,10 +88,10 @@ router.post(
 
       // Find and verify nonce
       const nonceDoc = await WalletNonce.findOne({
-        address: normalizedAddress,
+        address: normalizedAddressLower,
         chain: normalizedChain,
         nonce: msgNonce,
-        used: false,
+        usedAt: null,
       }).sort({ createdAt: -1 });
 
       if (!nonceDoc) {
@@ -137,26 +137,31 @@ router.post(
       }
 
       // Mark nonce as used
-      nonceDoc.used = true;
       nonceDoc.usedAt = new Date();
       await nonceDoc.save();
 
       // Find or create user
-      let user = await User.findByWallet(normalizedAddress, normalizedChain);
+      let user = await User.findByWallet(
+        normalizedAddressLower,
+        normalizedChain,
+      );
       let isNewUser = false;
 
       if (!user) {
         // Create new user with wallet as primary auth method
         user = await User.create({
-          email: walletPlaceholderEmail(normalizedAddress, normalizedChain),
+          email: walletPlaceholderEmail(
+            normalizedAddressLower,
+            normalizedChain,
+          ),
           role: "client",
           authMethod: "wallet",
-          walletAddress: normalizedAddress,
+          walletAddress: normalizedAddressLower,
           chain: normalizedChain,
           status: "Active", // Wallet users are auto-verified
           emailVerified: true, // No email needed for wallet auth
           wallets: [{
-            address: normalizedAddress,
+            address: normalizedAddressLower,
             chain: normalizedChain,
             type: "injected",
             isPrimary: true,
@@ -170,12 +175,14 @@ router.post(
 
       // Add wallet if not already linked
       const existingWallet = user.wallets.find(
-        (w) => w.address.toLowerCase() === normalizedAddress.toLowerCase() && w.chain === normalizedChain
+        (w) =>
+          w.address.toLowerCase() === normalizedAddressLower &&
+          w.chain === normalizedChain,
       );
 
       if (!existingWallet) {
         await user.addWallet({
-          address: normalizedAddress,
+          address: normalizedAddressLower,
           chain: normalizedChain,
           type: "injected",
           label: `${normalizedChain} Wallet`,
@@ -190,16 +197,16 @@ router.post(
         {
           sub: user._id.toString(),
           role: "client",
-          walletAddress: normalizedAddress,
+          walletAddress: normalizedAddressLower,
           chain: normalizedChain,
         },
         "30d",
       );
 
       // Record login for security monitoring
-      await recordLogin(user._id, req.ip, req.get('User-Agent'), 'wallet', {
+      await recordLogin(user._id.toString(), "wallet", req, {
         chain: normalizedChain,
-        address: normalizedAddress
+        address: normalizedAddressLower,
       });
 
       // Trigger webhooks

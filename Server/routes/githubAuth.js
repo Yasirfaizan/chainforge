@@ -10,7 +10,9 @@ import webhookService from "../services/webhookService.js";
 import { recordLogin } from "../services/loginHistoryService.js";
 
 const router = express.Router();
-
+const clientOrigin = String(
+  process.env.CLIENT_ORIGIN || "http://localhost:5173",
+).replace(/\/+$/, "");
 const githubEnabled = Boolean(
   process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET,
 );
@@ -75,7 +77,7 @@ router.get(
       return res.status(503).json({ error: "GitHub auth not configured" });
     return passport.authenticate("github", {
       session: false,
-      failureRedirect: `${process.env.CLIENT_ORIGIN || "http://localhost:5173"}/login`,
+      failureRedirect: `${clientOrigin}/login`,
     })(req, res, next);
   },
   async (req, res, next) => {
@@ -128,7 +130,7 @@ router.get(
         { sub: user._id.toString(), role: "client", email: user.email },
         "30d",
       );
-      const redirectBase = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+      const redirectBase = clientOrigin;
 
       // We'll use the same callback pattern as Google
       return res.redirect(

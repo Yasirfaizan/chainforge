@@ -104,8 +104,21 @@ async function buildMongoDnsFallbackUri(uri) {
 const app = express();
 const PORT = process.env.PORT || 5001;
 const startTime = Date.now();
-const ADMIN_ROUTE_SLUG =
-  process.env.ADMIN_ROUTE_SLUG || "admin-dev-only-slug-change-me";
+
+function normalizeAdminSlug(value = "") {
+  const cleaned = String(value).trim().replace(/^\/+|\/+$/g, "");
+  if (!cleaned) return "";
+  if (cleaned.toLowerCase() === "admin") return "";
+  if (cleaned.toLowerCase().startsWith("admin/")) {
+    return cleaned.slice("admin/".length);
+  }
+  return cleaned;
+}
+
+const ADMIN_ROUTE_SLUG = normalizeAdminSlug(process.env.ADMIN_ROUTE_SLUG);
+const ADMIN_ROUTE_PREFIX = ADMIN_ROUTE_SLUG
+  ? `/api/admin/${ADMIN_ROUTE_SLUG}`
+  : "/api/admin";
 app.set("trust proxy", 1);
 
 /* ——— Global middleware ——— */
@@ -384,7 +397,7 @@ app.get("/api/docs", (_req, res) =>
       "POST /api/admin/login": {
         note: "Legacy route deprecated, returns 404",
       },
-      [`POST /api/admin/${ADMIN_ROUTE_SLUG}/signup`]: {
+      [`POST ${ADMIN_ROUTE_PREFIX}/signup`]: {
         body: {
           name: "string",
           email: "string",
@@ -394,7 +407,7 @@ app.get("/api/docs", (_req, res) =>
         },
         returns: "{ token, user, totpQrDataUrl }",
       },
-      [`POST /api/admin/${ADMIN_ROUTE_SLUG}/login`]: {
+      [`POST ${ADMIN_ROUTE_PREFIX}/login`]: {
         body: { email: "string", password: "string", totpCode: "string" },
         returns: "{ token, user }",
       },
@@ -547,7 +560,9 @@ app.use("/api/auth", googleAuthRoutes);
 app.use("/api/auth", githubAuthRoutes);
 app.use("/api/auth/wallet", walletAuthRoutes);
 app.use("/api/admin", adminGuard, adminAuthRoutes);
+if (ADMIN_ROUTE_SLUG) {
 app.use(`/api/admin/${ADMIN_ROUTE_SLUG}`, adminGuard, adminAuthRoutes);
+}
 app.use("/api/admin/mgmt", adminGuard, adminMgmtRoutes);
 app.use("/api/keys", apiKeyRoutes);
 app.use("/api/data", dataRoutes);

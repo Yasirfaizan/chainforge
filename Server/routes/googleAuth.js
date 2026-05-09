@@ -15,7 +15,9 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const googleEnabled = Boolean(
   process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET,
 );
-
+const clientOrigin = String(
+  process.env.CLIENT_ORIGIN || "http://localhost:5173",
+).replace(/\/+$/, "");
 if (googleEnabled) {
   passport.use(
     new GoogleStrategy(
@@ -81,7 +83,7 @@ router.get(
       return res.status(503).json({ error: "Google auth not configured" });
     return passport.authenticate("google", {
       session: false,
-      failureRedirect: `${process.env.CLIENT_ORIGIN}/client/login`,
+      failureRedirect: `${clientOrigin}/login`,
     })(req, res, next);
   },
   async (req, res, next) => {
@@ -128,7 +130,7 @@ router.get(
         { sub: user._id.toString(), role: "client", email: user.email },
         "30d",
       );
-      const redirectBase = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+      const redirectBase = clientOrigin;
       return res.redirect(
         `${redirectBase}/auth/callback?token=${encodeURIComponent(token)}`,
       );

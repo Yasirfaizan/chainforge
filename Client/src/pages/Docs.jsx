@@ -371,16 +371,21 @@ export default function Docs() {
               {import.meta.env.VITE_API_URL || "https://chainforge-gold.vercel.app/"}
             </code>
           </p>
-          <CodeBlock lang="bash">{`# 1. Sign up
-curl -X POST ${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/client/signup \\
+         <CodeBlock lang="bash">{`# 1. Sign up (send verification code)
+curl -X POST ${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/client/signup/initiate 
   -H "Content-Type: application/json" \\
   -d '{"email":"dev@example.com","password":"mypassword","name":"Dev"}'
 
-# 2. Use the returned token
+# 2. Verify code and receive token
+curl -X POST ${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/client/signup/verify \\
+  -H "Content-Type: application/json" \\
+  -d '{"email":"dev@example.com","code":"123456"}'
+
+# 3. Use the returned token
 curl ${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/data/stats \\
   -H "Authorization: Bearer <your-token>"
 
-# 3. Generate an API key
+# 4. Generate an API key
 curl -X POST ${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/keys/generate \\
   -H "Authorization: Bearer <your-token>" \\
   -H "Content-Type: application/json" \\

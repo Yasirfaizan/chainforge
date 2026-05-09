@@ -23,7 +23,7 @@
 class ChainForgeSDK {
   constructor(config = {}) {
     this.apiKey = config.apiKey;
-    this.baseURL = config.baseURL || "https://api.chainforge.io";
+    this.baseURL = config.baseURL || 'https://api.chainforge.io';
     this.timeout = config.timeout || 30000;
 
     // Initialize sub-modules
@@ -44,13 +44,13 @@ class ChainForgeSDK {
   async _request(method, endpoint, data = null, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
     const headers = {
-      "Content-Type": "application/json",
-      "X-API-Key": this.apiKey,
+      'Content-Type': 'application/json',
+      'X-API-Key': this.apiKey,
       ...options.headers,
     };
 
     if (this._token) {
-      headers["Authorization"] = `Bearer ${this._token}`;
+      headers['Authorization'] = `Bearer ${this._token}`;
     }
 
     const config = {
@@ -59,7 +59,7 @@ class ChainForgeSDK {
       ...options,
     };
 
-    if (data && method !== "GET") {
+    if (data && method !== 'GET') {
       config.body = JSON.stringify(data);
     }
 
@@ -70,15 +70,15 @@ class ChainForgeSDK {
       if (!response.ok) {
         throw new ChainForgeError(
           result.error?.message || `HTTP ${response.status}`,
-          result.error?.code || "UNKNOWN_ERROR",
-          response.status,
+          result.error?.code || 'UNKNOWN_ERROR',
+          response.status
         );
       }
 
       return result;
     } catch (error) {
       if (error instanceof ChainForgeError) throw error;
-      throw new ChainForgeError(error.message, "NETWORK_ERROR");
+      throw new ChainForgeError(error.message, 'NETWORK_ERROR');
     }
   }
 
@@ -90,9 +90,9 @@ class ChainForgeSDK {
     this._user = user;
 
     // Store in localStorage for persistence
-    if (typeof localStorage !== "undefined") {
-      localStorage.setItem("chainforge_token", token);
-      localStorage.setItem("chainforge_user", JSON.stringify(user));
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('chainforge_token', token);
+      localStorage.setItem('chainforge_user', JSON.stringify(user));
     }
   }
 
@@ -114,10 +114,10 @@ class ChainForgeSDK {
    * Restore session from storage
    */
   async restoreSession() {
-    if (typeof localStorage === "undefined") return false;
+    if (typeof localStorage === 'undefined') return false;
 
-    const token = localStorage.getItem("chainforge_token");
-    const userStr = localStorage.getItem("chainforge_user");
+    const token = localStorage.getItem('chainforge_token');
+    const userStr = localStorage.getItem('chainforge_user');
 
     if (token && userStr) {
       this._token = token;
@@ -135,9 +135,9 @@ class ChainForgeSDK {
     this._token = null;
     this._user = null;
 
-    if (typeof localStorage !== "undefined") {
-      localStorage.removeItem("chainforge_token");
-      localStorage.removeItem("chainforge_user");
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('chainforge_token');
+      localStorage.removeItem('chainforge_user');
     }
   }
 }
@@ -148,7 +148,7 @@ class ChainForgeSDK {
 class ChainForgeError extends Error {
   constructor(message, code, status = null) {
     super(message);
-    this.name = "ChainForgeError";
+    this.name = 'ChainForgeError';
     this.code = code;
     this.status = status;
   }
@@ -175,15 +175,12 @@ class AuthModule {
    * console.log(user.chain);   // ethereum
    */
   async connectWallet(walletType, options = {}) {
-    const chain = options.chain || "ethereum";
+    const chain = options.chain || 'ethereum';
 
     // Check if wallet is installed
     const wallet = this._detectWallet(walletType);
     if (!wallet.installed) {
-      throw new ChainForgeError(
-        `${wallet.name} is not installed`,
-        "WALLET_NOT_INSTALLED",
-      );
+      throw new ChainForgeError(`${wallet.name} is not installed`, 'WALLET_NOT_INSTALLED');
     }
 
     // Connect to wallet
@@ -191,28 +188,24 @@ class AuthModule {
 
     // Request nonce + canonical message from backend
     const nonceResult = await this.sdk._request(
-      "GET",
-      `/api/auth/wallet/nonce?address=${encodeURIComponent(connection.address)}&chain=${encodeURIComponent(chain)}`,
+      'GET',
+      `/api/auth/wallet/nonce?address=${encodeURIComponent(connection.address)}&chain=${encodeURIComponent(chain)}`
     );
 
     // Ask wallet to sign the exact server-provided message
     const signature = await this._signWalletMessage(
       walletType,
       nonceResult.message,
-      connection.address,
+      connection.address
     );
 
     // Complete auth using compatibility endpoint
-    const authResult = await this.sdk._request(
-      "POST",
-      "/api/client/wallet-auth",
-      {
-        walletAddress: connection.address,
-        chain,
-        signature,
-        message: nonceResult.message,
-      },
-    );
+    const authResult = await this.sdk._request('POST', '/api/client/wallet-auth', {
+      walletAddress: connection.address,
+      chain,
+      signature,
+      message: nonceResult.message,
+    });
 
     // Store auth
     this.sdk._setAuth(authResult.token, authResult.user);
@@ -227,10 +220,17 @@ class AuthModule {
   /**
    * Login with email/password
    */
-  async loginWithEmail(email, password) {
-    const result = await this.sdk._request("POST", "/api/client/login", {
+  async requestEmailLoginCode(email, password) {
+    return this.sdk._request('POST', '/api/client/login/initiate', {
       email,
       password,
+    });
+  }
+
+  async verifyEmailLoginCode(email, code) {
+    const result = await this.sdk._request('POST', '/api/client/login/verify', {
+      email,
+      code,
     });
 
     this.sdk._setAuth(result.token, result.user);
@@ -241,14 +241,35 @@ class AuthModule {
     };
   }
 
+  async loginWithEmail(email, password, code = '') {
+    if (code) {
+      return this.verifyEmailLoginCode(email, code);
+    }
+
+    const result = await this.requestEmailLoginCode(email, password);
+    return {
+      requiresVerification: true,
+      email: result.email || email,
+      expiresIn: result.expiresIn,
+      message: result.message,
+    };
+  }
+
   /**
    * Sign up with email/password
    */
-  async signupWithEmail(email, password, name = "") {
-    const result = await this.sdk._request("POST", "/api/client/signup", {
+  async requestEmailSignupCode(email, password, name = '') {
+    return this.sdk._request('POST', '/api/client/signup/initiate', {
       email,
       password,
       name,
+    });
+  }
+
+  async verifyEmailSignupCode(email, code) {
+    const result = await this.sdk._request('POST', '/api/client/signup/verify', {
+      email,
+      code,
     });
 
     this.sdk._setAuth(result.token, result.user);
@@ -256,6 +277,20 @@ class AuthModule {
     return {
       user: result.user,
       token: result.token,
+    };
+  }
+
+  async signupWithEmail(email, password, name = '', code = '') {
+    if (code) {
+      return this.verifyEmailSignupCode(email, code);
+    }
+
+    const result = await this.requestEmailSignupCode(email, password, name);
+    return {
+      requiresVerification: true,
+      email: result.email || email,
+      expiresIn: result.expiresIn,
+      message: result.message,
     };
   }
 
@@ -284,9 +319,9 @@ class AuthModule {
    * Auto-connect to previously used wallet
    */
   async autoConnect() {
-    if (typeof localStorage === "undefined") return null;
+    if (typeof localStorage === 'undefined') return null;
 
-    const saved = localStorage.getItem("chainforge_wallet");
+    const saved = localStorage.getItem('chainforge_wallet');
     if (saved) {
       const { walletId, chainId } = JSON.parse(saved);
       return this.connectWallet(walletId, { chain: chainId });
@@ -297,26 +332,24 @@ class AuthModule {
   _detectWallet(type) {
     const wallets = {
       metamask: {
-        name: "MetaMask",
-        installed: typeof window !== "undefined" && window.ethereum?.isMetaMask,
-        installUrl: "https://metamask.io/download/",
+        name: 'MetaMask',
+        installed: typeof window !== 'undefined' && window.ethereum?.isMetaMask,
+        installUrl: 'https://metamask.io/download/',
       },
       phantom: {
-        name: "Phantom",
-        installed: typeof window !== "undefined" && !!window.solana?.isPhantom,
-        installUrl: "https://phantom.app/download",
+        name: 'Phantom',
+        installed: typeof window !== 'undefined' && !!window.solana?.isPhantom,
+        installUrl: 'https://phantom.app/download',
       },
       brave: {
-        name: "Brave Wallet",
-        installed:
-          typeof window !== "undefined" && window.ethereum?.isBraveWallet,
-        installUrl: "https://brave.com/wallet/",
+        name: 'Brave Wallet',
+        installed: typeof window !== 'undefined' && window.ethereum?.isBraveWallet,
+        installUrl: 'https://brave.com/wallet/',
       },
       coinbase: {
-        name: "Coinbase Wallet",
-        installed:
-          typeof window !== "undefined" && window.ethereum?.isCoinbaseWallet,
-        installUrl: "https://www.coinbase.com/wallet",
+        name: 'Coinbase Wallet',
+        installed: typeof window !== 'undefined' && window.ethereum?.isCoinbaseWallet,
+        installUrl: 'https://www.coinbase.com/wallet',
       },
     };
 
@@ -326,37 +359,32 @@ class AuthModule {
   async _connectToWallet(type, chain) {
     // Simplified - would use ethers.js or @solana/web3.js
     // This is a placeholder for the actual implementation
-    if (
-      type === "metamask" &&
-      typeof window !== "undefined" &&
-      window.ethereum
-    ) {
+    if (type === 'metamask' && typeof window !== 'undefined' && window.ethereum) {
       const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts",
+        method: 'eth_requestAccounts',
       });
       return {
         address: accounts[0],
         chain: chain,
-        type: "evm",
+        type: 'evm',
       };
     }
 
-    if (type === "phantom" && typeof window !== "undefined" && window.solana) {
+    if (type === 'phantom' && typeof window !== 'undefined' && window.solana) {
       await window.solana.connect();
       return {
         address: window.solana.publicKey.toString(),
-        chain: "solana",
-        type: "solana",
+        chain: 'solana',
+        type: 'solana',
       };
     }
 
-    throw new ChainForgeError("Wallet connection failed", "CONNECTION_FAILED");
+    throw new ChainForgeError('Wallet connection failed', 'CONNECTION_FAILED');
   }
 
   _bytesToBase58(bytes) {
-    const alphabet =
-      "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-    if (!bytes || bytes.length === 0) return "";
+    const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    if (!bytes || bytes.length === 0) return '';
 
     let digits = [0];
     for (let i = 0; i < bytes.length; i += 1) {
@@ -372,9 +400,9 @@ class AuthModule {
       }
     }
 
-    let result = "";
+    let result = '';
     for (let i = 0; i < bytes.length && bytes[i] === 0; i += 1) {
-      result += "1";
+      result += '1';
     }
     for (let i = digits.length - 1; i >= 0; i -= 1) {
       result += alphabet[digits[i]];
@@ -385,39 +413,30 @@ class AuthModule {
   async _signWalletMessage(walletType, message, address) {
     if (!message || !address) {
       throw new ChainForgeError(
-        "Missing message or address for wallet signing",
-        "SIGNATURE_INPUT_MISSING",
+        'Missing message or address for wallet signing',
+        'SIGNATURE_INPUT_MISSING'
       );
     }
 
     if (
-      (walletType === "metamask" ||
-        walletType === "brave" ||
-        walletType === "coinbase") &&
-      typeof window !== "undefined" &&
+      (walletType === 'metamask' || walletType === 'brave' || walletType === 'coinbase') &&
+      typeof window !== 'undefined' &&
       window.ethereum
     ) {
       return window.ethereum.request({
-        method: "personal_sign",
+        method: 'personal_sign',
         params: [message, address],
       });
     }
 
-    if (
-      walletType === "phantom" &&
-      typeof window !== "undefined" &&
-      window.solana?.signMessage
-    ) {
+    if (walletType === 'phantom' && typeof window !== 'undefined' && window.solana?.signMessage) {
       const encodedMessage = new TextEncoder().encode(message);
-      const signed = await window.solana.signMessage(encodedMessage, "utf8");
+      const signed = await window.solana.signMessage(encodedMessage, 'utf8');
       const signatureBytes = signed?.signature || signed;
       return this._bytesToBase58(signatureBytes);
     }
 
-    throw new ChainForgeError(
-      "Wallet does not support message signing",
-      "SIGNATURE_NOT_SUPPORTED",
-    );
+    throw new ChainForgeError('Wallet does not support message signing', 'SIGNATURE_NOT_SUPPORTED');
   }
 }
 
@@ -443,15 +462,15 @@ class DataModule {
   async getBalance(address = null, chain = null) {
     const user = this.sdk.currentUser;
     const targetAddress = address || user?.walletAddress;
-    const targetChain = chain || user?.chain || "ethereum";
+    const targetChain = chain || user?.chain || 'ethereum';
 
     if (!targetAddress) {
-      throw new ChainForgeError("No address provided", "MISSING_ADDRESS");
+      throw new ChainForgeError('No address provided', 'MISSING_ADDRESS');
     }
 
     const result = await this.sdk._request(
-      "GET",
-      `/api/onchain/balance/${targetAddress}?chain=${targetChain}`,
+      'GET',
+      `/api/onchain/balance/${targetAddress}?chain=${targetChain}`
     );
 
     return result.data.nativeBalance;
@@ -471,16 +490,16 @@ class DataModule {
   async getHistory(options = {}) {
     const user = this.sdk.currentUser;
     const address = options.address || user?.walletAddress;
-    const chain = options.chain || user?.chain || "ethereum";
+    const chain = options.chain || user?.chain || 'ethereum';
     const limit = options.limit || 20;
 
     if (!address) {
-      throw new ChainForgeError("No address provided", "MISSING_ADDRESS");
+      throw new ChainForgeError('No address provided', 'MISSING_ADDRESS');
     }
 
     const result = await this.sdk._request(
-      "GET",
-      `/api/onchain/history/${address}?chain=${chain}&limit=${limit}`,
+      'GET',
+      `/api/onchain/history/${address}?chain=${chain}&limit=${limit}`
     );
 
     return result.data.transactions;
@@ -492,11 +511,11 @@ class DataModule {
    * @param {string} chain - Chain ID
    */
   async getTransaction(hash, chain = null) {
-    const targetChain = chain || this.sdk.currentUser?.chain || "ethereum";
+    const targetChain = chain || this.sdk.currentUser?.chain || 'ethereum';
 
     const result = await this.sdk._request(
-      "GET",
-      `/api/onchain/humanize/${hash}?chain=${targetChain}`,
+      'GET',
+      `/api/onchain/humanize/${hash}?chain=${targetChain}`
     );
 
     return result.data;
@@ -507,7 +526,7 @@ class DataModule {
    * @returns {Promise<{synced: number}>}
    */
   async sync() {
-    const result = await this.sdk._request("POST", "/api/onchain/multisync");
+    const result = await this.sdk._request('POST', '/api/onchain/multisync');
     return result.data;
   }
 }
@@ -540,15 +559,14 @@ class TransactionModule {
     const user = this.sdk.currentUser;
 
     if (!user) {
-      throw new ChainForgeError("User not authenticated", "NOT_AUTHENTICATED");
+      throw new ChainForgeError('User not authenticated', 'NOT_AUTHENTICATED');
     }
 
     // Parse amount (e.g., "0.1 ETH" -> { value: "0.1", symbol: "ETH" })
     const parsedAmount = this._parseAmount(amount);
 
     // Auto-estimate gas
-    const gasEstimate =
-      options.gasLimit || (await this._estimateGas(to, parsedAmount));
+    const gasEstimate = options.gasLimit || (await this._estimateGas(to, parsedAmount));
 
     // Send via wallet
     const tx = await this._sendViaWallet({
@@ -571,16 +589,13 @@ class TransactionModule {
    */
   async estimateGas(to, amount) {
     // Would use actual gas estimation
-    return "21000"; // Default for simple transfer
+    return '21000'; // Default for simple transfer
   }
 
   _parseAmount(amount) {
     const match = amount.match(/^([\d.]+)\s*(\w+)$/);
     if (!match) {
-      throw new ChainForgeError(
-        'Invalid amount format. Use "0.1 ETH"',
-        "INVALID_AMOUNT",
-      );
+      throw new ChainForgeError('Invalid amount format. Use "0.1 ETH"', 'INVALID_AMOUNT');
     }
     return {
       value: match[1],
@@ -591,7 +606,7 @@ class TransactionModule {
   async _sendViaWallet(params) {
     // Would use ethers.js or @solana/web3.js
     // Placeholder implementation
-    if (typeof window !== "undefined" && window.ethereum) {
+    if (typeof window !== 'undefined' && window.ethereum) {
       const provider = window.ethereum.providers
         ? new window.ethereum.providers.Web3Provider(window.ethereum)
         : null;
@@ -606,16 +621,16 @@ class TransactionModule {
       }
     }
 
-    throw new ChainForgeError("Wallet not connected", "WALLET_NOT_CONNECTED");
+    throw new ChainForgeError('Wallet not connected', 'WALLET_NOT_CONNECTED');
   }
 
   _getExplorerUrl() {
-    const chain = this.sdk.currentUser?.chain || "ethereum";
+    const chain = this.sdk.currentUser?.chain || 'ethereum';
     const explorers = {
-      ethereum: "https://etherscan.io",
-      polygon: "https://polygonscan.com",
-      bnb: "https://bscscan.com",
-      solana: "https://solscan.io",
+      ethereum: 'https://etherscan.io',
+      polygon: 'https://polygonscan.com',
+      bnb: 'https://bscscan.com',
+      solana: 'https://solscan.io',
     };
     return explorers[chain] || explorers.ethereum;
   }
@@ -623,10 +638,7 @@ class TransactionModule {
   async _waitForConfirmation(hash) {
     // Would poll for confirmation
     return new Promise((resolve) => {
-      setTimeout(
-        () => resolve({ confirmed: true, blockNumber: 12345678 }),
-        3000,
-      );
+      setTimeout(() => resolve({ confirmed: true, blockNumber: 12345678 }), 3000);
     });
   }
 }
@@ -644,7 +656,7 @@ class WalletModule {
    * @returns {Promise<Array>}
    */
   async getAll() {
-    const result = await this.sdk._request("GET", "/api/wallets");
+    const result = await this.sdk._request('GET', '/api/wallets');
     return result.data.wallets;
   }
 
@@ -653,7 +665,7 @@ class WalletModule {
    * @param {Object} wallet
    */
   async link(wallet) {
-    const result = await this.sdk._request("POST", "/api/wallets/link", wallet);
+    const result = await this.sdk._request('POST', '/api/wallets/link', wallet);
     return result.data;
   }
 
@@ -662,7 +674,7 @@ class WalletModule {
    * @param {string} walletId
    */
   async unlink(walletId) {
-    await this.sdk._request("DELETE", `/api/wallets/${walletId}`);
+    await this.sdk._request('DELETE', `/api/wallets/${walletId}`);
   }
 
   /**
@@ -670,7 +682,7 @@ class WalletModule {
    * @param {string} walletId
    */
   async setPrimary(walletId) {
-    await this.sdk._request("PATCH", `/api/wallets/${walletId}/primary`);
+    await this.sdk._request('PATCH', `/api/wallets/${walletId}/primary`);
   }
 }
 
@@ -715,7 +727,7 @@ class WebhookModule {
       try {
         callback(data);
       } catch (e) {
-        console.error("Webhook callback error:", e);
+        console.error('Webhook callback error:', e);
       }
     });
   }
@@ -726,6 +738,6 @@ export { ChainForgeSDK, ChainForgeError };
 export default ChainForgeSDK;
 
 // UMD build compatibility
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   window.ChainForge = ChainForgeSDK;
 }
