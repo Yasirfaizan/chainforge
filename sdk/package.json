@@ -1,0 +1,70 @@
+{
+  "name": "@chainforge/sdk",
+  "version": "1.0.1",
+  "description": "The Firebase of Web3 - Simple, powerful Web3 integration without blockchain knowledge",
+  "main": "chainforge-sdk.js",
+  "module": "chainforge-sdk.js",
+  "type": "module",
+  "types": "chainforge-sdk.d.ts",
+  "files": [
+    "chainforge-sdk.js",
+    "chainforge-sdk.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node build.js",
+    "test": "node test/test.js",
+    "test:watch": "node test/test.js --watch",
+    "lint": "eslint chainforge-sdk.js",
+    "format": "prettier --write chainforge-sdk.js",
+    "prepublishOnly": "echo skipping",
+    "prepack": "npm run build",
+    "version:patch": "npm version patch",
+    "version:minor": "npm version minor",
+    "version:major": "npm version major",
+    "version:pre": "npm version prerelease --preid=beta"
+  },
+  "keywords": [
+    "web3",
+    "blockchain",
+    "ethereum",
+    "solana",
+    "wallet",
+    "authentication",
+    "firebase",
+    "sdk",
+    "dapp",
+    "crypto"
+  ],
+  "author": "ChainForge",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yasirfaizan/chainforge/sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Yasirfaizan/chainforge/sdk/issues"
+  },
+  "homepage": "https://chainforge.io",
+  "peerDependencies": {
+    "ethers": "^6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "ethers": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "jest": "^29.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

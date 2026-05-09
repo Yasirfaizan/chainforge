@@ -1,0 +1,19 @@
+{
+  "name": "@chainforge/examples",
+  "version": "1.0.0",
+  "description": "ChainForge SDK Examples",
+  "type": "module",
+  "scripts": {
+    "basic": "node basic-usage.js",
+    "react": "echo 'Run React example in a React project'",
+    "portfolio": "node multichain-portfolio.js",
+    "all": "npm run basic && npm run portfolio"
+  },
+  "dependencies": {
+    "@chainforge/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  }
+}

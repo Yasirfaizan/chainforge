@@ -1,0 +1,11 @@
+node_modules
+.env
+.env.local
+.env.development
+*.log
+*.tmp
+.DS_Store
+scratch/
+dist/
+.cache/
+*.timestamp-*

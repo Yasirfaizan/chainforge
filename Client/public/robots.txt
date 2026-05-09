@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /__cf_console_
+Disallow: /admin
