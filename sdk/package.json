@@ -41,12 +41,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Yasirfaizan/chainforge/sdk.git"
+    "url": "git+https://github.com/Yasirfaizan/chainforge/tree/main/sdk"
   },
   "bugs": {
-    "url": "https://github.com/Yasirfaizan/chainforge/sdk/issues"
+    "url": "https://github.com/Yasirfaizan/chainforge"
   },
-  "homepage": "https://chainforge.io",
+  "homepage": "https://chainforge-henna.vercel.app/",
   "peerDependencies": {
     "ethers": "^6.0.0"
   },
