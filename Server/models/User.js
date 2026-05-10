@@ -165,6 +165,40 @@ const userSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+// --- DATA SANITATION HOOK ---
+// This fixes "poisoned" legacy data (e.g. missing emails or bad enum types) 
+// BEFORE Mongoose runs its internal validation.
+userSchema.pre("validate", function (next) {
+  // 1. Fix invalid wallet types in the wallets array
+  if (this.wallets && Array.isArray(this.wallets)) {
+    this.wallets.forEach((w) => {
+      if (w.type && !["injected", "private_key"].includes(w.type)) {
+        w.type = "injected";
+      }
+    });
+  }
+
+  // 2. Fix missing email for wallet-based users to satisfy 'required: true'
+  if (!this.email) {
+    const mainAddress =
+      this.walletAddress || (this.wallets && this.wallets[0]?.address);
+    const mainChain =
+      this.chain || (this.wallets && this.wallets[0]?.chain) || "wallet";
+
+    if (mainAddress) {
+      const safeAddr = String(mainAddress)
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+      const safeChain = String(mainChain)
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+      this.email = `wallet-${safeChain}-${safeAddr}@wallet.chainforge.local`;
+    }
+  }
+
+  next();
+});
+
 // Compound indexes for wallet lookups
 userSchema.index({ walletAddress: 1, chain: 1 }, { sparse: true });
 userSchema.index({ "wallets.address": 1, "wallets.chain": 1 });
