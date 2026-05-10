@@ -117,14 +117,25 @@ app.set("trust proxy", 1);
 app.use(
   cors({
     origin(origin, callback) {
-      if (!allowedOrigins || allowedOrigins.length === 0 || !origin) {
+      // Allow internal requests or if no origins specified
+      if (!origin || !allowedOrigins || allowedOrigins.length === 0) {
         return callback(null, true);
       }
+      
       const normalized = normalizeOrigin(origin);
-      if (allowedOrigins.includes(normalized)) {
+      
+      // Permissive match for hackathon
+      if (
+        allowedOrigins.includes(normalized) || 
+        normalized.includes("vercel.app") || 
+        normalized.includes("railway.app") ||
+        normalized.includes("localhost")
+      ) {
         return callback(null, true);
       }
-      return callback(new Error("Not allowed by CORS"));
+      
+      console.warn(`[CORS] Rejected origin: ${origin} (Normalized: ${normalized})`);
+      return callback(null, false); // Return false instead of throwing error
     },
     credentials: true,
   }),
