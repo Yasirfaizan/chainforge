@@ -12,8 +12,8 @@ export default function AdminLogin() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: "yasirfaizan680@gmail.com",
+    password: "1234567890",
     totpCode: "",
   });
   const [totp, setTotp] = useState(["", "", "", "", "", ""]);
@@ -102,6 +102,11 @@ export default function AdminLogin() {
           Secure admin access
         </p>
         <h1 className="mt-2 text-2xl font-bold text-cf-text">Admin Login</h1>
+        <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+          <p className="text-[10px] uppercase tracking-widest font-bold text-red-500 mb-1">Hackathon Access</p>
+          <p className="text-xs text-cf-muted">Demo Email: <span className="text-cf-text font-mono">yasirfaizan680@gmail.com</span></p>
+          <p className="text-xs text-cf-muted">Demo Pass: <span className="text-cf-text font-mono">1234567890</span></p>
+        </div>
         {step === 1 && (
           <form className="mt-5 space-y-3" onSubmit={submitStep1}>
             <input

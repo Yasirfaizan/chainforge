@@ -47,6 +47,7 @@ const walletSchema = new mongoose.Schema({
     type: String,
     enum: ["injected", "private_key"],
     default: "injected",
+    set: (v) => ["injected", "private_key"].includes(v) ? v : "injected",
   },
   label: {
     type: String,
@@ -78,6 +79,15 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     trim: true,
+    set: function(v) {
+      // If email is missing but user has a wallet, generate placeholder to satisfy validation
+      if (!v && (this.walletAddress || (this.wallets && this.wallets.length > 0))) {
+        const addr = this.walletAddress || this.wallets[0]?.address || "unknown";
+        const chain = this.chain || this.wallets[0]?.chain || "wallet";
+        return `wallet-${chain}-${addr.toLowerCase().replace(/[^a-z0-9]/g, "")}@wallet.chainforge.local`;
+      }
+      return v;
+    }
   },
   googleId: {
     type: String,
