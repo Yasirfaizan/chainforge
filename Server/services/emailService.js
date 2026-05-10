@@ -29,8 +29,14 @@ const createTransporter = () => {
       rejectUnauthorized: true,
       minVersion: "TLSv1.2",
     },
+    // Force IPv4 as Railway/Cloud environments often have IPv6 routing issues
+    family: 4,
+    // Prevent long hangs
+    connectionTimeout: 10000, // 10s
+    greetingTimeout: 10000,   // 10s
+    socketTimeout: 15000,    // 15s
   });
-};
+}
 
 // Verify SMTP config once at module load so misconfiguration is caught early
 const _transporter = createTransporter();

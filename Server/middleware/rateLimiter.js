@@ -95,30 +95,19 @@ export function rateLimit({
       return entry;
     };
 
-    // Use a simple lock mechanism to prevent race conditions
-    if (!store.has(`lock:${key}`)) {
-      store.set(`lock:${key}`, true);
-      try {
-        const entry = getOrCreateEntry();
-        entry.count++;
-        
-        res.setHeader("X-RateLimit-Limit", max);
-        res.setHeader("X-RateLimit-Remaining", Math.max(0, max - entry.count));
-        res.setHeader("X-RateLimit-Reset", Math.ceil(entry.resetAt / 1000));
+    // Thread-safe memory fallback
+    const entry = getOrCreateEntry();
+    entry.count++;
+    
+    res.setHeader("X-RateLimit-Limit", max);
+    res.setHeader("X-RateLimit-Remaining", Math.max(0, max - entry.count));
+    res.setHeader("X-RateLimit-Reset", Math.ceil(entry.resetAt / 1000));
 
-        if (entry.count > max) {
-          return res.status(429).json({ error: message });
-        }
-
-        return next();
-      } finally {
-        store.delete(`lock:${key}`);
-      }
-    } else {
-      // If locked, wait briefly and retry
-      await new Promise(resolve => setTimeout(resolve, 1));
-      return rateLimit({ windowMs, max, message, keyGenerator })(req, res, next);
+    if (entry.count > max) {
+      return res.status(429).json({ error: message });
     }
+
+    return next();
   };
 }
 
