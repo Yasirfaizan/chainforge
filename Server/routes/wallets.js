@@ -65,9 +65,14 @@ router.post(
     try {
       const { address, chain, label } = req.body;
       const userId = req.user.sub;
-      const normalizedChain = String(chain || "").trim().toLowerCase();
-      const rawType = String(req.body.type || "injected").trim().toLowerCase();
-      const type = rawType === "solana" || rawType === "evm" ? "injected" : rawType;
+      const normalizedChain = String(chain || "")
+        .trim()
+        .toLowerCase();
+      const rawType = String(req.body.type || "injected")
+        .trim()
+        .toLowerCase();
+      const type =
+        rawType === "solana" || rawType === "evm" ? "injected" : rawType;
 
       // Validate address format
       if (normalizedChain !== "solana" && !address.startsWith("0x")) {

@@ -15,18 +15,138 @@ const WALLET_STATE = {
 };
 
 const CHAIN_CONFIG = {
-  ethereum: { id: 1, name: "Ethereum", symbol: "ETH", decimals: 18, rpc: "https://eth.llamarpc.com", explorer: "https://etherscan.io", color: "#627EEA", type: "evm", gasBadge: "high" },
-  polygon: { id: 137, name: "Polygon", symbol: "POL", decimals: 18, rpc: "https://polygon.llamarpc.com", explorer: "https://polygonscan.com", color: "#8247E5", type: "evm", gasBadge: "low" },
-  bnb: { id: 56, name: "BNB Chain", symbol: "BNB", decimals: 18, rpc: "https://binance.llamarpc.com", explorer: "https://bscscan.com", color: "#F3BA2F", type: "evm", gasBadge: "low" },
-  avalanche: { id: 43114, name: "Avalanche", symbol: "AVAX", decimals: 18, rpc: "https://avalanche.llamarpc.com", explorer: "https://snowtrace.io", color: "#E84142", type: "evm", gasBadge: "low" },
-  arbitrum: { id: 42161, name: "Arbitrum", symbol: "ETH", decimals: 18, rpc: "https://arbitrum.llamarpc.com", explorer: "https://arbiscan.io", color: "#28A0F0", type: "evm", gasBadge: "low" },
-  optimism: { id: 10, name: "Optimism", symbol: "ETH", decimals: 18, rpc: "https://optimism.llamarpc.com", explorer: "https://optimistic.etherscan.io", color: "#FF0420", type: "evm", gasBadge: "low" },
-  base: { id: 8453, name: "Base", symbol: "ETH", decimals: 18, rpc: "https://mainnet.base.org", explorer: "https://basescan.org", color: "#0052FF", type: "evm", gasBadge: "low" },
-  zksync: { id: 324, name: "zkSync", symbol: "ETH", decimals: 18, rpc: "https://mainnet.era.zksync.io", explorer: "https://era.zksync.network", color: "#8C8DFC", type: "evm", gasBadge: "low" },
-  linea: { id: 59144, name: "Linea", symbol: "ETH", decimals: 18, rpc: "https://rpc.linea.build", explorer: "https://lineascan.build", color: "#121212", type: "evm", gasBadge: "low" },
-  solana: { id: "mainnet-beta", name: "Solana", symbol: "SOL", decimals: 9, rpc: "https://api.mainnet-beta.solana.com", explorer: "https://solscan.io", color: "#14F195", type: "solana", gasBadge: "very-low" },
-  sui: { id: 784, name: "Sui", symbol: "SUI", decimals: 9, rpc: "https://fullnode.mainnet.sui.io:443", explorer: "https://suivision.xyz", color: "#4DA2FF", type: "sui", gasBadge: "very-low" },
-  bitcoin: { id: 0, name: "Bitcoin", symbol: "BTC", decimals: 8, rpc: "https://mempool.space/api", explorer: "https://mempool.space", color: "#F7931A", type: "bitcoin", gasBadge: "medium" },
+  ethereum: {
+    id: 1,
+    name: "Ethereum",
+    symbol: "ETH",
+    decimals: 18,
+    rpc: "https://eth.llamarpc.com",
+    explorer: "https://etherscan.io",
+    color: "#627EEA",
+    type: "evm",
+    gasBadge: "high",
+  },
+  polygon: {
+    id: 137,
+    name: "Polygon",
+    symbol: "POL",
+    decimals: 18,
+    rpc: "https://polygon.llamarpc.com",
+    explorer: "https://polygonscan.com",
+    color: "#8247E5",
+    type: "evm",
+    gasBadge: "low",
+  },
+  bnb: {
+    id: 56,
+    name: "BNB Chain",
+    symbol: "BNB",
+    decimals: 18,
+    rpc: "https://binance.llamarpc.com",
+    explorer: "https://bscscan.com",
+    color: "#F3BA2F",
+    type: "evm",
+    gasBadge: "low",
+  },
+  avalanche: {
+    id: 43114,
+    name: "Avalanche",
+    symbol: "AVAX",
+    decimals: 18,
+    rpc: "https://avalanche.llamarpc.com",
+    explorer: "https://snowtrace.io",
+    color: "#E84142",
+    type: "evm",
+    gasBadge: "low",
+  },
+  arbitrum: {
+    id: 42161,
+    name: "Arbitrum",
+    symbol: "ETH",
+    decimals: 18,
+    rpc: "https://arbitrum.llamarpc.com",
+    explorer: "https://arbiscan.io",
+    color: "#28A0F0",
+    type: "evm",
+    gasBadge: "low",
+  },
+  optimism: {
+    id: 10,
+    name: "Optimism",
+    symbol: "ETH",
+    decimals: 18,
+    rpc: "https://optimism.llamarpc.com",
+    explorer: "https://optimistic.etherscan.io",
+    color: "#FF0420",
+    type: "evm",
+    gasBadge: "low",
+  },
+  base: {
+    id: 8453,
+    name: "Base",
+    symbol: "ETH",
+    decimals: 18,
+    rpc: "https://mainnet.base.org",
+    explorer: "https://basescan.org",
+    color: "#0052FF",
+    type: "evm",
+    gasBadge: "low",
+  },
+  zksync: {
+    id: 324,
+    name: "zkSync",
+    symbol: "ETH",
+    decimals: 18,
+    rpc: "https://mainnet.era.zksync.io",
+    explorer: "https://era.zksync.network",
+    color: "#8C8DFC",
+    type: "evm",
+    gasBadge: "low",
+  },
+  linea: {
+    id: 59144,
+    name: "Linea",
+    symbol: "ETH",
+    decimals: 18,
+    rpc: "https://rpc.linea.build",
+    explorer: "https://lineascan.build",
+    color: "#121212",
+    type: "evm",
+    gasBadge: "low",
+  },
+  solana: {
+    id: "mainnet-beta",
+    name: "Solana",
+    symbol: "SOL",
+    decimals: 9,
+    rpc: "https://api.mainnet-beta.solana.com",
+    explorer: "https://solscan.io",
+    color: "#14F195",
+    type: "solana",
+    gasBadge: "very-low",
+  },
+  sui: {
+    id: 784,
+    name: "Sui",
+    symbol: "SUI",
+    decimals: 9,
+    rpc: "https://fullnode.mainnet.sui.io:443",
+    explorer: "https://suivision.xyz",
+    color: "#4DA2FF",
+    type: "sui",
+    gasBadge: "very-low",
+  },
+  bitcoin: {
+    id: 0,
+    name: "Bitcoin",
+    symbol: "BTC",
+    decimals: 8,
+    rpc: "https://mempool.space/api",
+    explorer: "https://mempool.space",
+    color: "#F7931A",
+    type: "bitcoin",
+    gasBadge: "medium",
+  },
 };
 
 class WalletEventEmitter {
@@ -55,12 +175,19 @@ class WalletEventEmitter {
 }
 
 function getEip6963Providers() {
-  const providers = window.ethereum?.providers || (window.ethereum ? [window.ethereum] : []);
+  const providers =
+    window.ethereum?.providers || (window.ethereum ? [window.ethereum] : []);
   return providers;
 }
 
 function pickInjectedProvider(walletId) {
   const providers = getEip6963Providers();
+  if (walletId === "phantom" && window.phantom?.ethereum) {
+    return window.phantom.ethereum;
+  }
+  if (walletId === "backpack" && window.backpack?.ethereum) {
+    return window.backpack.ethereum;
+  }
   if (!providers.length) return window.ethereum || null;
   const byWallet = {
     metamask: (p) => p.isMetaMask && !p.isBraveWallet && !p.isRabby,
@@ -80,26 +207,219 @@ function pickInjectedProvider(walletId) {
 
 function isInstalled(id) {
   if (id === "walletconnect") return true;
-  if (id === "ledger") return typeof navigator !== "undefined" && ("hid" in navigator || "usb" in navigator);
-  if (id === "phantom") return Boolean(window.solana?.isPhantom || window.phantom?.solana);
-  if (id === "backpack") return Boolean(window.backpack?.solana || window.solana?.isBackpack);
+  if (id === "ledger")
+    return (
+      typeof navigator !== "undefined" &&
+      ("hid" in navigator || "usb" in navigator)
+    );
+  if (id === "phantom")
+    return Boolean(window.solana?.isPhantom || window.phantom?.solana);
+  if (id === "backpack")
+    return Boolean(window.backpack?.solana || window.solana?.isBackpack);
   if (id === "suiWallet") return Boolean(window.suiWallet || window.sui);
   return Boolean(pickInjectedProvider(id));
 }
 
 const SUPPORTED_WALLETS = {
-  metamask: { id: "metamask", name: "MetaMask", icon: "/wallets/metamask.svg", chains: ["ethereum","polygon","bnb","avalanche","arbitrum","optimism","base","zksync","linea"], type: "evm", installUrl: "https://metamask.io/download/" },
-  phantom: { id: "phantom", name: "Phantom", icon: "/wallets/phantom.svg", chains: ["solana","ethereum","polygon","bnb","base"], type: "multi", installUrl: "https://phantom.app/download" },
-  brave: { id: "brave", name: "Brave Wallet", icon: "/wallets/brave.svg", chains: ["ethereum","polygon","bnb","avalanche","arbitrum","optimism","base","zksync","linea"], type: "evm", installUrl: "https://brave.com/wallet/" },
-  coinbase: { id: "coinbase", name: "Coinbase Wallet", icon: "/wallets/coinbase.svg", chains: ["ethereum","polygon","bnb","avalanche","arbitrum","optimism","base","zksync","linea"], type: "evm", installUrl: "https://www.coinbase.com/wallet" },
-  trust: { id: "trust", name: "Trust Wallet", icon: "/wallets/trust.svg", chains: ["ethereum","polygon","bnb","avalanche","arbitrum","optimism","base","zksync","linea"], type: "evm", installUrl: "https://trustwallet.com/" },
-  okx: { id: "okx", name: "OKX Wallet", icon: "/wallets/okx.svg", chains: ["ethereum","polygon","bnb","avalanche","arbitrum","optimism","base","zksync","linea"], type: "evm", installUrl: "https://www.okx.com/web3" },
-  rabby: { id: "rabby", name: "Rabby", icon: "/wallets/rabby.svg", chains: ["ethereum","polygon","bnb","avalanche","arbitrum","optimism","base","zksync","linea"], type: "evm", installUrl: "https://rabby.io/" },
-  rainbow: { id: "rainbow", name: "Rainbow", icon: "/wallets/rainbow.svg", chains: ["ethereum","polygon","bnb","avalanche","arbitrum","optimism","base","zksync","linea"], type: "evm", installUrl: "https://rainbow.me/" },
-  walletconnect: { id: "walletconnect", name: "WalletConnect", icon: "/wallets/walletconnect.svg", chains: ["ethereum","polygon","bnb","avalanche","arbitrum","optimism","base","zksync","linea"], type: "multi", installUrl: "https://walletconnect.com/" },
-  ledger: { id: "ledger", name: "Ledger", icon: "/wallets/ledger.svg", chains: ["ethereum","polygon","bnb","avalanche","arbitrum","optimism","base","zksync","linea","solana","bitcoin"], type: "multi", installUrl: "https://www.ledger.com/" },
-  backpack: { id: "backpack", name: "Backpack", icon: "/wallets/backpack.svg", chains: ["solana","ethereum","polygon","bnb","avalanche","arbitrum","optimism","base","zksync","linea"], type: "multi", installUrl: "https://backpack.app/" },
-  suiWallet: { id: "suiWallet", name: "Sui Wallet", icon: "/wallets/suiwallet.svg", chains: ["sui"], type: "sui", installUrl: "https://suiwallet.com/" },
+  metamask: {
+    id: "metamask",
+    name: "MetaMask",
+    icon: "/wallets/metamask.svg",
+    chains: [
+      "ethereum",
+      "polygon",
+      "bnb",
+      "avalanche",
+      "arbitrum",
+      "optimism",
+      "base",
+      "zksync",
+      "linea",
+    ],
+    type: "evm",
+    installUrl: "https://metamask.io/download/",
+  },
+  phantom: {
+    id: "phantom",
+    name: "Phantom",
+    icon: "/wallets/phantom.svg",
+    chains: ["solana", "ethereum", "polygon", "bnb", "base"],
+    type: "multi",
+    installUrl: "https://phantom.app/download",
+  },
+  brave: {
+    id: "brave",
+    name: "Brave Wallet",
+    icon: "/wallets/brave.svg",
+    chains: [
+      "ethereum",
+      "polygon",
+      "bnb",
+      "avalanche",
+      "arbitrum",
+      "optimism",
+      "base",
+      "zksync",
+      "linea",
+    ],
+    type: "evm",
+    installUrl: "https://brave.com/wallet/",
+  },
+  coinbase: {
+    id: "coinbase",
+    name: "Coinbase Wallet",
+    icon: "/wallets/coinbase.svg",
+    chains: [
+      "ethereum",
+      "polygon",
+      "bnb",
+      "avalanche",
+      "arbitrum",
+      "optimism",
+      "base",
+      "zksync",
+      "linea",
+    ],
+    type: "evm",
+    installUrl: "https://www.coinbase.com/wallet",
+  },
+  trust: {
+    id: "trust",
+    name: "Trust Wallet",
+    icon: "/wallets/trust.svg",
+    chains: [
+      "ethereum",
+      "polygon",
+      "bnb",
+      "avalanche",
+      "arbitrum",
+      "optimism",
+      "base",
+      "zksync",
+      "linea",
+    ],
+    type: "evm",
+    installUrl: "https://trustwallet.com/",
+  },
+  okx: {
+    id: "okx",
+    name: "OKX Wallet",
+    icon: "/wallets/okx.svg",
+    chains: [
+      "ethereum",
+      "polygon",
+      "bnb",
+      "avalanche",
+      "arbitrum",
+      "optimism",
+      "base",
+      "zksync",
+      "linea",
+    ],
+    type: "evm",
+    installUrl: "https://www.okx.com/web3",
+  },
+  rabby: {
+    id: "rabby",
+    name: "Rabby",
+    icon: "/wallets/rabby.svg",
+    chains: [
+      "ethereum",
+      "polygon",
+      "bnb",
+      "avalanche",
+      "arbitrum",
+      "optimism",
+      "base",
+      "zksync",
+      "linea",
+    ],
+    type: "evm",
+    installUrl: "https://rabby.io/",
+  },
+  rainbow: {
+    id: "rainbow",
+    name: "Rainbow",
+    icon: "/wallets/rainbow.svg",
+    chains: [
+      "ethereum",
+      "polygon",
+      "bnb",
+      "avalanche",
+      "arbitrum",
+      "optimism",
+      "base",
+      "zksync",
+      "linea",
+    ],
+    type: "evm",
+    installUrl: "https://rainbow.me/",
+  },
+  walletconnect: {
+    id: "walletconnect",
+    name: "WalletConnect",
+    icon: "/wallets/walletconnect.svg",
+    chains: [
+      "ethereum",
+      "polygon",
+      "bnb",
+      "avalanche",
+      "arbitrum",
+      "optimism",
+      "base",
+      "zksync",
+      "linea",
+    ],
+    type: "multi",
+    installUrl: "https://walletconnect.com/",
+  },
+  ledger: {
+    id: "ledger",
+    name: "Ledger",
+    icon: "/wallets/ledger.svg",
+    chains: [
+      "ethereum",
+      "polygon",
+      "bnb",
+      "avalanche",
+      "arbitrum",
+      "optimism",
+      "base",
+      "zksync",
+      "linea",
+      "solana",
+      "bitcoin",
+    ],
+    type: "multi",
+    installUrl: "https://www.ledger.com/",
+  },
+  backpack: {
+    id: "backpack",
+    name: "Backpack",
+    icon: "/wallets/backpack.svg",
+    chains: [
+      "solana",
+      "ethereum",
+      "polygon",
+      "bnb",
+      "avalanche",
+      "arbitrum",
+      "optimism",
+      "base",
+      "zksync",
+      "linea",
+    ],
+    type: "multi",
+    installUrl: "https://backpack.app/",
+  },
+  suiWallet: {
+    id: "suiWallet",
+    name: "Sui Wallet",
+    icon: "/wallets/suiwallet.svg",
+    chains: ["sui"],
+    type: "sui",
+    installUrl: "https://suiwallet.com/",
+  },
 };
 
 class ChainForgeWalletSDK {
@@ -122,7 +442,13 @@ class ChainForgeWalletSDK {
   getWalletConflicts() {
     const providers = getEip6963Providers();
     return providers.length > 1
-      ? { hasConflict: true, count: providers.length, brands: providers.map((p) => Object.keys(p).filter((k) => k.startsWith("is") && p[k])) }
+      ? {
+          hasConflict: true,
+          count: providers.length,
+          brands: providers.map((p) =>
+            Object.keys(p).filter((k) => k.startsWith("is") && p[k]),
+          ),
+        }
       : { hasConflict: false, count: providers.length, brands: [] };
   }
 
@@ -151,7 +477,9 @@ class ChainForgeWalletSDK {
       this.walletConnectProvider = await EthereumProvider.init({
         projectId,
         chains: [CHAIN_CONFIG.ethereum.id],
-        optionalChains: Object.values(CHAIN_CONFIG).filter((c) => c.type === "evm").map((c) => c.id),
+        optionalChains: Object.values(CHAIN_CONFIG)
+          .filter((c) => c.type === "evm")
+          .map((c) => c.id),
         showQrModal: true,
       });
       await this.walletConnectProvider.enable();
@@ -159,7 +487,10 @@ class ChainForgeWalletSDK {
       this.signer = await this.provider.getSigner();
       this.address = await this.signer.getAddress();
     } else if (walletId === "ledger") {
-      const transport = ("hid" in navigator) ? await TransportWebHID.create() : await TransportWebUSB.create();
+      const transport =
+        "hid" in navigator
+          ? await TransportWebHID.create()
+          : await TransportWebUSB.create();
       this.ledgerEth = new AppEth(transport);
       const path = "44'/60'/0'/0/0";
       const res = await this.ledgerEth.getAddress(path, false, true);
@@ -170,15 +501,17 @@ class ChainForgeWalletSDK {
       this.provider = sui;
       this.address = acc?.[0];
     } else if (chain === "solana") {
-      const sol = walletId === "backpack"
-        ? window.backpack?.solana || window.solana
-        : window.solana || window.phantom?.solana;
+      const sol =
+        walletId === "backpack"
+          ? window.backpack?.solana || window.solana
+          : window.solana || window.phantom?.solana;
       if (!sol?.connect) throw new Error("Solana wallet provider not found");
       const res = await sol.connect();
       this.provider = sol;
       this.address = res.publicKey?.toString() || sol.publicKey?.toString();
     } else {
       const injected = pickInjectedProvider(walletId);
+      if (!injected?.request) throw new Error("EVM wallet provider not found");
       await injected.request({ method: "eth_requestAccounts" });
       this.provider = new BrowserProvider(injected);
       this.signer = await this.provider.getSigner();
@@ -189,17 +522,31 @@ class ChainForgeWalletSDK {
     this.connectedWallet = wallet;
     this.connectedChain = CHAIN_CONFIG[chain] || CHAIN_CONFIG.ethereum;
     this.state = WALLET_STATE.CONNECTED;
-    this.emitter.emit("connect", { wallet: this.connectedWallet, chain: this.connectedChain, address: this.address });
-    return { success: true, wallet: this.connectedWallet, chain: this.connectedChain, address: this.address };
+    this.emitter.emit("connect", {
+      wallet: this.connectedWallet,
+      chain: this.connectedChain,
+      address: this.address,
+    });
+    return {
+      success: true,
+      wallet: this.connectedWallet,
+      chain: this.connectedChain,
+      address: this.address,
+    };
   }
 
   _bindInjectedEvents(provider) {
-    provider?.on?.("accountsChanged", (accounts) => this.emitter.emit("accountsChanged", accounts));
-    provider?.on?.("chainChanged", (chainId) => this.emitter.emit("chainChanged", chainId));
+    provider?.on?.("accountsChanged", (accounts) =>
+      this.emitter.emit("accountsChanged", accounts),
+    );
+    provider?.on?.("chainChanged", (chainId) =>
+      this.emitter.emit("chainChanged", chainId),
+    );
   }
 
   async disconnect() {
-    if (this.walletConnectProvider?.disconnect) await this.walletConnectProvider.disconnect();
+    if (this.walletConnectProvider?.disconnect)
+      await this.walletConnectProvider.disconnect();
     if (this.provider?.disconnect) await this.provider.disconnect();
     this.state = WALLET_STATE.DISCONNECTED;
     this.connectedWallet = null;
@@ -222,7 +569,10 @@ class ChainForgeWalletSDK {
       if (!this.provider?.signMessage) {
         throw new Error("Solana wallet is not connected");
       }
-      const signed = await this.provider.signMessage(new TextEncoder().encode(message), "utf8");
+      const signed = await this.provider.signMessage(
+        new TextEncoder().encode(message),
+        "utf8",
+      );
       return bs58.encode(signed.signature || signed);
     }
     if (this.connectedChain?.type === "sui") {
@@ -239,7 +589,8 @@ class ChainForgeWalletSDK {
   }
 
   async signTx(tx) {
-    if (this.connectedChain?.type === "evm" && this.signer) return this.signer.signTransaction(tx);
+    if (this.connectedChain?.type === "evm" && this.signer)
+      return this.signer.signTransaction(tx);
     if (this.connectedChain?.type === "solana") {
       const txn = tx instanceof Transaction ? tx : Transaction.from(tx);
       const signed = await this.provider.signTransaction(txn);
@@ -257,20 +608,32 @@ class ChainForgeWalletSDK {
     }
 
     const hex = `0x${chain.id.toString(16)}`;
-    const reqProvider = this.walletConnectProvider || this.provider?.provider || pickInjectedProvider(this.connectedWallet?.id);
+    const reqProvider =
+      this.walletConnectProvider ||
+      this.provider?.provider ||
+      pickInjectedProvider(this.connectedWallet?.id);
     try {
-      await reqProvider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hex }] });
+      await reqProvider.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: hex }],
+      });
     } catch (e) {
       if (e?.code === 4902) {
         await reqProvider.request({
           method: "wallet_addEthereumChain",
-          params: [{
-            chainId: hex,
-            chainName: chain.name,
-            nativeCurrency: { name: chain.symbol, symbol: chain.symbol, decimals: chain.decimals },
-            rpcUrls: [chain.rpc],
-            blockExplorerUrls: [chain.explorer],
-          }],
+          params: [
+            {
+              chainId: hex,
+              chainName: chain.name,
+              nativeCurrency: {
+                name: chain.symbol,
+                symbol: chain.symbol,
+                decimals: chain.decimals,
+              },
+              rpcUrls: [chain.rpc],
+              blockExplorerUrls: [chain.explorer],
+            },
+          ],
         });
       } else {
         throw e;
@@ -284,14 +647,24 @@ class ChainForgeWalletSDK {
     if (!address || !chain) return null;
     const cfg = CHAIN_CONFIG[chain] || CHAIN_CONFIG.ethereum;
     if (cfg.type === "evm") {
-      const provider = this.provider || new BrowserProvider(pickInjectedProvider(this.connectedWallet?.id));
+      const provider =
+        this.provider ||
+        new BrowserProvider(pickInjectedProvider(this.connectedWallet?.id));
       const wei = await provider.getBalance(address);
-      return { raw: wei.toString(), formatted: Number(formatEther(wei)).toFixed(4), symbol: cfg.symbol };
+      return {
+        raw: wei.toString(),
+        formatted: Number(formatEther(wei)).toFixed(4),
+        symbol: cfg.symbol,
+      };
     }
     if (cfg.type === "solana") {
       const conn = new Connection(cfg.rpc, "confirmed");
       const lamports = await conn.getBalance(new PublicKey(address));
-      return { raw: String(lamports), formatted: (lamports / 1e9).toFixed(4), symbol: "SOL" };
+      return {
+        raw: String(lamports),
+        formatted: (lamports / 1e9).toFixed(4),
+        symbol: "SOL",
+      };
     }
     return null;
   }
