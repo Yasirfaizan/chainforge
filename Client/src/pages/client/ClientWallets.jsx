@@ -28,11 +28,11 @@ export default function ClientWallets() {
     
     setLinking(true);
     try {
-      await api.post("/api/wallets/link", { 
-        address, 
-        chain, 
-        type: chain === "solana" ? "solana" : "evm", 
-        label: label || "Primary Wallet"
+      await api.post("/api/wallets/link", {
+        address,
+        chain,
+        type: "injected",
+        label: label || "Primary Wallet",
       });
       setAddress(""); setLabel(""); setShowAddForm(false);
       qc.invalidateQueries({ queryKey: ["wallets"] });

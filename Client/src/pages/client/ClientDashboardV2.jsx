@@ -202,7 +202,12 @@ function WalletSection() {
     if (!address.startsWith("0x") && chain !== "solana") { showToast("Please enter a valid EVM address", "error"); return; }
     setLinking(true);
     try {
-      await api.post("/api/wallets/link", { address, chain, type: chain === "solana" ? "solana" : "evm", label });
+      await api.post("/api/wallets/link", {
+        address,
+        chain,
+        type: "injected",
+        label,
+      });
       setAddress(""); setLabel(""); setShowForm(false);
       qc.invalidateQueries({ queryKey: ["wallets"] });
       showToast("Wallet linked successfully", "success");

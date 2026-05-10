@@ -169,8 +169,11 @@ class ChainForgeWalletSDK {
       const acc = await sui.request({ method: "sui_requestAccounts" });
       this.provider = sui;
       this.address = acc?.[0];
-    } else if (chain === "solana" || walletId === "phantom" || walletId === "backpack") {
-      const sol = walletId === "backpack" ? window.backpack?.solana || window.solana : window.solana || window.phantom?.solana;
+    } else if (chain === "solana") {
+      const sol = walletId === "backpack"
+        ? window.backpack?.solana || window.solana
+        : window.solana || window.phantom?.solana;
+      if (!sol?.connect) throw new Error("Solana wallet provider not found");
       const res = await sol.connect();
       this.provider = sol;
       this.address = res.publicKey?.toString() || sol.publicKey?.toString();
@@ -216,6 +219,9 @@ class ChainForgeWalletSDK {
       return `0x${sig.r}${sig.s}${sig.v.toString(16)}`;
     }
     if (this.connectedChain?.type === "solana") {
+      if (!this.provider?.signMessage) {
+        throw new Error("Solana wallet is not connected");
+      }
       const signed = await this.provider.signMessage(new TextEncoder().encode(message), "utf8");
       return bs58.encode(signed.signature || signed);
     }
@@ -225,6 +231,9 @@ class ChainForgeWalletSDK {
         params: { message: btoa(message), account: this.address },
       });
       return out.signature || out;
+    }
+    if (!this.signer?.signMessage) {
+      throw new Error("EVM wallet is not connected");
     }
     return this.signer.signMessage(message);
   }

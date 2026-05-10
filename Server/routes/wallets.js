@@ -60,25 +60,28 @@ router.get("/", async (req, res, next) => {
  */
 router.post(
   "/link",
-  validate({ address: "string", chain: "string", type: "string" }),
+  validate({ address: "string", chain: "string" }),
   async (req, res, next) => {
     try {
-      const { address, chain, type, label } = req.body;
+      const { address, chain, label } = req.body;
       const userId = req.user.sub;
+      const normalizedChain = String(chain || "").trim().toLowerCase();
+      const rawType = String(req.body.type || "injected").trim().toLowerCase();
+      const type = rawType === "solana" || rawType === "evm" ? "injected" : rawType;
 
       // Validate address format
-      if (type === "evm" && !address.startsWith("0x")) {
+      if (normalizedChain !== "solana" && !address.startsWith("0x")) {
         return res.status(400).json({ error: "Invalid EVM address format" });
       }
-      if (type === "solana" && address.length < 32) {
+      if (normalizedChain === "solana" && address.length < 32) {
         return res.status(400).json({ error: "Invalid Solana address" });
       }
 
       // Check if wallet is already linked to another user
       const existingUser = await User.findOne({
         $or: [
-          { walletAddress: address, chain },
-          { "wallets.address": address, "wallets.chain": chain },
+          { walletAddress: address, chain: normalizedChain },
+          { "wallets.address": address, "wallets.chain": normalizedChain },
         ],
         _id: { $ne: userId },
       });
@@ -94,17 +97,17 @@ router.post(
         return res.status(404).json({ error: "User not found" });
       }
 
-      await user.addWallet({ address, chain, type, label });
+      await user.addWallet({ address, chain: normalizedChain, type, label });
 
       webhookService
         .triggerEvent(
           userId,
           "wallet.linked",
           webhookService.EventBuilders.walletLinked(
-            { address, chain, type, label: label || "" },
+            { address, chain: normalizedChain, type, label: label || "" },
             user,
           ),
-          { chain, walletAddress: address },
+          { chain: normalizedChain, walletAddress: address },
         )
         .catch(() => {});
 
@@ -116,7 +119,7 @@ router.post(
           webhookService.EventBuilders.userUpdated(user, {
             action: "wallet_linked",
             walletAddress: address,
-            chain,
+            chain: normalizedChain,
           }),
         )
         .catch(() => {});
@@ -127,7 +130,7 @@ router.post(
         wallet: {
           id: user.wallets[user.wallets.length - 1]._id.toString(),
           address,
-          chain,
+          chain: normalizedChain,
           type,
           label: label,
           number: walletNumber,
