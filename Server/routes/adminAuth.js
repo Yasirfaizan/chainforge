@@ -234,6 +234,11 @@ router.post(
         return res.status(409).json({ error: "Email already registered" });
       }
       if (existing && !existing.emailVerified) {
+        // Restore any admin code that was marked as used by this pending user
+        await AdminCode.updateMany(
+          { usedBy: existing._id },
+          { used: false, usedBy: null, usedAt: null }
+        );
         await User.deleteOne({ _id: existing._id });
         await VerificationCode.deleteMany({ userId: existing._id });
       }

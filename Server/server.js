@@ -39,11 +39,16 @@ function normalizeOrigin(origin = "") {
 
 function buildAllowedOrigins() {
   const raw = process.env.CLIENT_ORIGIN;
-  if (!raw) return null;
-  return raw
-    .split(",")
-    .map((value) => normalizeOrigin(value))
-    .filter(Boolean);
+  const origins = raw
+    ? raw.split(",").map((value) => normalizeOrigin(value))
+    : [];
+
+  // Always allow common local development origins
+  origins.push("http://localhost:5173");
+  origins.push("http://localhost:3000");
+  origins.push("http://localhost:5001");
+
+  return [...new Set(origins.filter(Boolean))];
 }
 
 const allowedOrigins = buildAllowedOrigins();

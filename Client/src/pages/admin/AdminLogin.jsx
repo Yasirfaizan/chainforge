@@ -16,7 +16,7 @@ export default function AdminLogin() {
     password: "",
     totpCode: "",
   });
-  const [totp, setTotp] = useState(["", "", "", "", "", "", ""]);
+  const [totp, setTotp] = useState(["", "", "", "", "", ""]);
   const [totp2FA, setTotp2FA] = useState("");
   const [requiresTOTP, setRequiresTOTP] = useState(false);
   const inputsRef = useRef([]);
