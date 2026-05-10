@@ -26,7 +26,7 @@ export function errorHandler(err, _req, res, _next) {
   const message = err.message || "Internal server error";
 
   return res.status(status).json({
-    error: message,
+    error: "DEBUG: " + message,
     stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
   });
 }

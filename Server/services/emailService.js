@@ -11,7 +11,7 @@ import nodemailer from "nodemailer";
  */
 const createTransporter = () => {
   const host = process.env.SMTP_HOST || "smtp.gmail.com";
-  const port = parseInt(process.env.SMTP_PORT || "587", 10);
+  const port = parseInt(process.env.SMTP_PORT || "465", 10);
   // port 465 uses implicit TLS; all other ports (587, 25) use STARTTLS
   const secure = port === 465;
 
@@ -31,10 +31,10 @@ const createTransporter = () => {
     },
     // Force IPv4 as Railway/Cloud environments often have IPv6 routing issues
     family: 4,
-    // Prevent long hangs
-    connectionTimeout: 10000, // 10s
-    greetingTimeout: 10000,   // 10s
-    socketTimeout: 15000,    // 15s
+    // Prevent long hangs — must be less than frontend 15s timeout
+    connectionTimeout: 5000, // 5s
+    greetingTimeout: 5000,   // 5s
+    socketTimeout: 8000,    // 8s
   });
 }
 
