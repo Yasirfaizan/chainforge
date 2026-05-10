@@ -166,7 +166,9 @@ userSchema.virtual("primaryWallet").get(function () {
 
 // Method to add a wallet
 userSchema.methods.addWallet = async function (walletData) {
-  const { address, chain, type, label } = walletData;
+  const { address, chain, label } = walletData;
+  const VALID_WALLET_TYPES = ["injected", "private_key"];
+  const type = VALID_WALLET_TYPES.includes(walletData.type) ? walletData.type : "injected";
 
   // Check if wallet already exists
   const exists = this.wallets.find(

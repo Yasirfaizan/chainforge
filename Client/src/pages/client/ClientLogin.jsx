@@ -76,6 +76,9 @@ function VerificationInput({ onSubmit, onResend, email, loading, timeLeft }) {
           <br />
           <span className="text-on-surface font-medium">{email}</span>
         </p>
+        <p className="text-primary font-bold text-xs mt-2 bg-primary/10 py-1 rounded-full">
+          Hackathon Bypass: Use code 000000
+        </p>
       </div>
 
       <div className="flex justify-center gap-2">

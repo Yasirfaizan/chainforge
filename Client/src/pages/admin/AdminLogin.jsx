@@ -133,6 +133,11 @@ export default function AdminLogin() {
                 : "Enter the 6-digit code sent to your email."
               }
             </p>
+            {!requiresTOTP && (
+              <p className="text-xs font-bold text-red-500 bg-red-500/10 py-1 rounded-lg text-center">
+                Hackathon Bypass: Use code 000000
+              </p>
+            )}
             
             {/* Email OTP Input */}
             {!requiresTOTP && (

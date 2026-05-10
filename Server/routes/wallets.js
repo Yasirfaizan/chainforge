@@ -71,8 +71,8 @@ router.post(
       const rawType = String(req.body.type || "injected")
         .trim()
         .toLowerCase();
-      const type =
-        rawType === "solana" || rawType === "evm" ? "injected" : rawType;
+      const VALID_WALLET_TYPES = ["injected", "private_key"];
+      const type = VALID_WALLET_TYPES.includes(rawType) ? rawType : "injected";
 
       // Validate address format
       if (normalizedChain !== "solana" && !address.startsWith("0x")) {

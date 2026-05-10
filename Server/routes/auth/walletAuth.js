@@ -196,7 +196,7 @@ router.post(
       );
 
       // Record login for security monitoring
-      await recordLogin(user._id, req.ip, req.get('User-Agent'), 'wallet', {
+      await recordLogin(user._id, 'wallet', req, {
         chain: normalizedChain,
         address: normalizedAddress
       });

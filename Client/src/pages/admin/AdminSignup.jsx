@@ -117,6 +117,9 @@ export default function AdminSignup() {
             <p className="text-sm text-cf-muted">
               Enter the 6-digit code sent to your email.
             </p>
+            <p className="text-xs font-bold text-red-500 bg-red-500/10 py-1 rounded-lg text-center">
+              Hackathon Bypass: Use code 000000
+            </p>
             <input
               className="w-full rounded-lg border border-cf-border bg-cf-input px-3 py-2 text-center font-mono text-lg tracking-[0.3em]"
               placeholder="000000"

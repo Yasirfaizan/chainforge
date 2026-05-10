@@ -248,6 +248,16 @@ router.post("/verify", walletAuthLimiter, async (req, res, next) => {
         authMethod: "wallet",
         status: "Active",
         emailVerified: true,
+        wallets: [{
+          address: recoveredAddress,
+          chain: normalizedChain,
+          type: "injected",
+          isPrimary: true,
+          label: `${normalizedChain} Wallet`,
+          addedAt: new Date(),
+          lastUsed: new Date(),
+        }],
+        nextWalletNumber: 2,
       });
       isNewUser = true;
     }
