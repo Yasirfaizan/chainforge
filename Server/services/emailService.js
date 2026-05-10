@@ -1,3 +1,4 @@
+import nodemailer from "nodemailer";
 import { Resend } from "resend";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -46,9 +47,6 @@ if (_transporter) {
   console.log("🛠️ Email service: BYPASS MODE ACTIVE (Master Code: 000000)");
 }
 
-import nodemailer from "nodemailer";
-
-
 const normalizeVerificationType = (type) => {
   if (type === "admin_signup") return { baseType: "signup", isAdmin: true };
   if (type === "admin_login") return { baseType: "login", isAdmin: true };
@@ -84,13 +82,12 @@ const templates = {
           </h2>
           
           <p style="color: #6b7280; margin-bottom: 24px; font-size: 16px; line-height: 1.5;">
-            ${
-              baseType === "signup"
-                ? "Thank you for signing up! Please use the verification code below to complete your registration."
-                : baseType === "login"
-                  ? "Please use the verification code below to complete your login."
-                  : "You requested a password reset. Use the code below to proceed."
-            }
+            ${baseType === "signup"
+          ? "Thank you for signing up! Please use the verification code below to complete your registration."
+          : baseType === "login"
+            ? "Please use the verification code below to complete your login."
+            : "You requested a password reset. Use the code below to proceed."
+        }
           </p>
           
           <div style="background: white; border-radius: 8px; padding: 20px; margin: 24px 0; border: 2px dashed #7c3aed;">
@@ -115,7 +112,7 @@ const templates = {
         </div>
       </div>
     `,
-    text: `
+      text: `
   ChainForge ${audience}${subjectLabel} Verification
 
 Your verification code is: ${code}
@@ -127,7 +124,7 @@ If you didn't request this code, please ignore this email.
 © 2024 ChainForge
 support@chainforge.io
     `,
-  };
+    };
   },
 
   welcome: (name) => ({
@@ -270,6 +267,21 @@ export const sendWelcomeEmail = async (email, name) => {
   try {
     const template = templates.welcome(name);
 
+    if (process.env.SKIP_EMAIL_VERIFICATION === "true") {
+      return { success: true };
+    }
+
+    if (resend) {
+      const { data, error } = await resend.emails.send({
+        from: `ChainForge <${process.env.FROM_EMAIL || "onboarding@resend.dev"}>`,
+        to: email,
+        subject: template.subject,
+        html: template.html,
+      });
+      if (error) throw error;
+      return { success: true, messageId: data.id };
+    }
+
     const info = await _transporter.sendMail({
       from: `"ChainForge" <${process.env.SMTP_USER || "noreply@chainforge.io"}>`,
       to: email,
@@ -290,6 +302,21 @@ export const sendWelcomeEmail = async (email, name) => {
 export const sendPasswordResetConfirmation = async (email, name) => {
   try {
     const template = templates.passwordReset(name);
+
+    if (process.env.SKIP_EMAIL_VERIFICATION === "true") {
+      return { success: true };
+    }
+
+    if (resend) {
+      const { data, error } = await resend.emails.send({
+        from: `ChainForge <${process.env.FROM_EMAIL || "onboarding@resend.dev"}>`,
+        to: email,
+        subject: template.subject,
+        html: template.html,
+      });
+      if (error) throw error;
+      return { success: true };
+    }
 
     await _transporter.sendMail({
       from: `"ChainForge" <${process.env.SMTP_USER || "noreply@chainforge.io"}>`,
