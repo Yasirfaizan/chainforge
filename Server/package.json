@@ -42,8 +42,8 @@
     "stripe": "^22.1.0",
     "tweetnacl": "^1.0.3",
     "uuid": "^14.0.0",
-    "viem": "^2.48.1"
-    "resend": "^4.0.0""
+    "viem": "^2.48.1",
+    "resend": "^4.0.0"
   },
   "description": "",
   "main": "server.js",
