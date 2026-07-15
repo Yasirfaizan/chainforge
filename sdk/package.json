@@ -1,6 +1,6 @@
 {
   "name": "@chainforge/sdk",
-  "version": "1.0.1",
+  "version": "1.0.5",
   "description": "The Firebase of Web3 - Simple, powerful Web3 integration without blockchain knowledge",
   "main": "chainforge-sdk.js",
   "module": "chainforge-sdk.js",
